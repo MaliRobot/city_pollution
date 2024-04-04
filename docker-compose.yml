@@ -8,7 +8,6 @@ services:
     env_file:
       - ".env"
   fastapi:
-    image: python:3.9-slim
     build:
       context: ./
       dockerfile: Dockerfile
