@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    volumes:
+      - ./volumes/data:/var/lib/postgresql/data
+    env_file:
+      - ".env"
+  fastapi:
+    image: python:3.9-slim
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    depends_on:
+      - postgres
+    env_file:
+      - ".env"
+
+volumes:
+  data:

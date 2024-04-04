@@ -1,0 +1,12 @@
+#env
+.env
+.venv
+volumes/*
+!volumes/.gitkeep
+
+#python
+__pycache__/
+*.py[cod]
+
+#pycharm
+.idea
