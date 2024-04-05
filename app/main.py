@@ -3,7 +3,12 @@ from typing import Dict
 import uvicorn
 from fastapi import FastAPI
 
+from app.routers import location, pollution
+
 app = FastAPI()
+
+app.include_router(pollution.router)
+app.include_router(location.router)
 
 
 @app.get("/", operation_id="homepage")
