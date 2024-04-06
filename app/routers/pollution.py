@@ -1,12 +1,17 @@
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Dict, Union
 
 from fastapi import APIRouter, Depends, Query, status, HTTPException
 
 from app.db.repositories.city_repository import CityRepository
 from app.db.repositories.pollution_repository import PollutionRepository
 from app.dependencies import get_db, Session
-from app.schemas.pollution import Pollution, PollutionItem
+from app.schemas.city import City as CitySchema
+from app.schemas.pollution import (
+    Pollution as PollutionSchema,
+    PollutionItem,
+    PollutionItemList,
+)
 from app.services.city import get_cities
 from app.services.pollution import fetch_pollution_by_coords
 
@@ -20,7 +25,7 @@ router = APIRouter(
     "/",
     operation_id="get_pollution_by_coordinates",
     summary="Get pollution data by coordinates",
-    response_model=List[Pollution],
+    response_model=PollutionItemList,
 )
 async def get_pollution_data(
         lat: float = Query(..., description="Latitude", ge=-90, le=90),
@@ -35,7 +40,7 @@ async def get_pollution_data(
             ..., description="End time as timestamp", le=int(datetime.now().timestamp())
         ),
         db: Session = Depends(get_db),
-) -> List[PollutionItem]:
+) -> PollutionItemList:
     if end <= start:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -46,7 +51,10 @@ async def get_pollution_data(
     if city:
         pollution_repo = PollutionRepository(db)
         pollution = pollution_repo.get_pollution(start, end, city.id)
-        return pollution
+        return PollutionItemList(
+            data=[PollutionItem.from_orm(x) for x in pollution],
+            city=CitySchema.from_orm(city),
+        )
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
 
 
@@ -56,7 +64,7 @@ async def get_pollution_data(
     summary="Import pollution data",
 )
 async def import_historical_pollution_by_coords(
-        pollution_params: Pollution, db: Session = Depends(get_db)
+        pollution_params: PollutionSchema, db: Session = Depends(get_db)
 ) -> Dict[str, str]:
     city_repo = CityRepository(db)
     city = city_repo.search_city(

@@ -8,11 +8,11 @@ from app.entities.pollution import pollution_factory
 
 
 async def fetch_pollution_by_coords(
-        lat: float,
-        lon: float,
-        start: int,
-        end: int,
-        city_id: int,
+    lat: float,
+    lon: float,
+    start: int,
+    end: int,
+    city_id: int,
 ) -> List[Pollution] | None:
     async with AsyncClient() as client:
         response = await client.get(

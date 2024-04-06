@@ -18,7 +18,7 @@ class PollutionRepository:
     def get_pollution_by_id(self, pollution_id: int) -> Any:
         return self.db.query(Pollution).get(pollution_id)
 
-    def get_pollution(self, start: int, end: int, site_id: int) -> list[Any]:
+    def get_pollution(self, start: int, end: int, site_id: int) -> List[Pollution]:
         return (
             self.db.query(Pollution)
             .filter(

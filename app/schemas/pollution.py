@@ -1,8 +1,10 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional, List
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic_extra_types.coordinate import Longitude, Latitude
+
+from app.schemas.city import City
 
 
 class BasePollution(BaseModel):
@@ -28,13 +30,21 @@ class Pollution(BasePollution):
 
 class PollutionItem(BaseModel):
     id: int
-    co: float
-    no: float
-    no2: float
-    o3: float
-    so2: float
-    pm2: float
-    pm10: float
-    nh3: float
-    timestamp: int
+    co: Optional[float]
+    no: Optional[float]
+    no2: Optional[float]
+    o3: Optional[float]
+    so2: Optional[float]
+    pm2: Optional[float] = None
+    pm10: Optional[float]
+    nh3: Optional[float]
+    timestamp: Optional[int]
     site_id: int
+
+    class Config:
+        from_attributes = True
+
+
+class PollutionItemList(BaseModel):
+    data: List[PollutionItem]
+    city: City
