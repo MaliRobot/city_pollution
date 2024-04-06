@@ -1,16 +1,18 @@
-from typing import Dict, List
+from typing import List
 
 from httpx import AsyncClient
 
 from app.config.settings import settings
 from app.entities import Pollution
+from app.entities.pollution import pollution_factory
 
 
 async def fetch_pollution_by_coords(
-    lat: float,
-    lon: float,
-    start: int,
-    end: int,
+        lat: float,
+        lon: float,
+        start: int,
+        end: int,
+        city_id: int,
 ) -> List[Pollution] | None:
     async with AsyncClient() as client:
         response = await client.get(
@@ -21,21 +23,7 @@ async def fetch_pollution_by_coords(
         if len(response.json()["list"]) > 0:
             pollutions = response.json()["list"]
             for pollution in pollutions:
-                pollution = Pollution.from_raw_data(pollution)
+                pollution = pollution_factory(pollution, city_id)
                 pollutions_list.append(pollution)
         return pollutions_list
     return None
-
-
-async def update_pollution(lat: float, lon: float, start: int, end: int) -> Dict:
-    raise NotImplemented
-
-
-async def get_pollution_by_coords(lat: float, lon: float, start: int, end: int) -> Dict:
-    raise NotImplemented
-
-
-async def delete_pollution_by_coords(
-    lat: float, lon: float, start: int, end: int
-) -> Dict:
-    raise NotImplemented

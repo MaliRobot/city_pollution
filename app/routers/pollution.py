@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Dict, List, Union
 
 from fastapi import APIRouter, Depends, Query, status, HTTPException
 
 from app.db.repositories.city_repository import CityRepository
 from app.db.repositories.pollution_repository import PollutionRepository
 from app.dependencies import get_db, Session
-from app.schemas.pollution import Pollution
+from app.schemas.pollution import Pollution, PollutionItem
 from app.services.city import get_cities
 from app.services.pollution import fetch_pollution_by_coords
 
@@ -19,27 +20,34 @@ router = APIRouter(
     "/",
     operation_id="get_pollution_by_coordinates",
     summary="Get pollution data by coordinates",
+    response_model=List[Pollution],
 )
 async def get_pollution_data(
-    lat: float = Query(..., description="Latitude", ge=-90, le=90),
-    lon: float = Query(..., description="Longitude", ge=-180, le=180),
-    start: int = Query(
-        ...,
-        description="Start time as timestamp",
-        ge=0,
-        lt=int(datetime.now().timestamp()),
-    ),
-    end: int = Query(
-        ..., description="End time as timestamp", le=int(datetime.now().timestamp())
-    ),
-    db: Session = Depends(get_db),
-):
+        lat: float = Query(..., description="Latitude", ge=-90, le=90),
+        lon: float = Query(..., description="Longitude", ge=-180, le=180),
+        start: int = Query(
+            ...,
+            description="Start time as timestamp",
+            ge=0,
+            lt=int(datetime.now().timestamp()),
+        ),
+        end: int = Query(
+            ..., description="End time as timestamp", le=int(datetime.now().timestamp())
+        ),
+        db: Session = Depends(get_db),
+) -> List[PollutionItem]:
     if end <= start:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="End time must be greater than start time",
         )
-    return {}
+    city_repo = CityRepository(db)
+    city = city_repo.get_city_by_lat_and_lon(lat, lon)
+    if city:
+        pollution_repo = PollutionRepository(db)
+        pollution = pollution_repo.get_pollution(start, end, city.id)
+        return pollution
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
 
 
 @router.post(
@@ -48,17 +56,22 @@ async def get_pollution_data(
     summary="Import pollution data",
 )
 async def import_historical_pollution_by_coords(
-    pollution_params: Pollution, db: Session = Depends(get_db)
-):
-    city_data = await get_cities(
-        pollution_params.lat, pollution_params.lon, pollution_params.name
-    )
-    if city_data is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
-        )
+        pollution_params: Pollution, db: Session = Depends(get_db)
+) -> Dict[str, str]:
     city_repo = CityRepository(db)
-    city = city_repo.create_city(city_data)
+    city = city_repo.search_city(
+        pollution_params.name, pollution_params.lat, pollution_params.lon
+    )
+    if city is None:
+        city_data = await get_cities(
+            pollution_params.lat, pollution_params.lon, pollution_params.name
+        )
+        if city_data is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+            )
+
+        city = city_repo.create_city(city_data)
 
     if city:
         pollution_data = await fetch_pollution_by_coords(
@@ -66,6 +79,7 @@ async def import_historical_pollution_by_coords(
             pollution_params.lon,
             pollution_params.start,
             pollution_params.end,
+            city.id,
         )
 
         if pollution_data:
@@ -86,17 +100,24 @@ async def import_historical_pollution_by_coords(
     summary="Delete pollution data",
 )
 async def delete_pollution_data(
-    lat: float = Query(..., description="Latitude", ge=-90, le=90),
-    lon: float = Query(..., description="Longitude", ge=-180, le=180),
-    start: int = Query(
-        ...,
-        description="Start time as timestamp",
-        ge=0,
-        lt=int(datetime.now().timestamp()),
-    ),
-    end: int = Query(
-        ..., description="End time as timestamp", le=int(datetime.now().timestamp())
-    ),
-    db: Session = Depends(get_db),
-):
-    return {}
+        lat: float = Query(..., description="Latitude", ge=-90, le=90),
+        lon: float = Query(..., description="Longitude", ge=-180, le=180),
+        start: int = Query(
+            ...,
+            description="Start time as timestamp",
+            ge=0,
+            lt=int(datetime.now().timestamp()),
+        ),
+        end: int = Query(
+            ..., description="End time as timestamp", le=int(datetime.now().timestamp())
+        ),
+        db: Session = Depends(get_db),
+) -> Dict[str, Union[bool, int]]:
+    city_repo = CityRepository(db)
+    city = city_repo.get_city_by_lat_and_lon(lat, lon)
+    print(city)
+    if city is None:
+        raise HTTPException(status_code=404, detail="City not found")
+    pollution_repo = PollutionRepository(db)
+    result = pollution_repo.delete_pollution_range(start, end, city.id)
+    return {"success": True, "deleted": result}

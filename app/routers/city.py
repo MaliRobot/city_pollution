@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Query
 
 from app.services.city import get_city_by_name
@@ -15,5 +17,5 @@ router = APIRouter(
 )
 async def get_city_coords_by_name(
     name: str = Query(..., description="City name", min_length=1, max_length=255),
-):
+) -> Any:
     return await get_city_by_name(name)
