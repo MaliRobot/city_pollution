@@ -1,31 +1,18 @@
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
+from datetime import date
+from typing import Optional
 
 
 @dataclass
 class Pollution:
-    co: str
-    no: str
-    no2: str
+    co: float
+    no: float
+    no2: float
     o3: float
+    so2: float
     pm2_5: float
-    pm10: str
-    nh3: str
-    timestamp: int
-    site_id: Optional[int]
+    pm10: float
+    nh3: float
+    date: date
+    city_id: Optional[int]
     id: Optional[int] = None
-
-
-def pollution_factory(data: Dict[Any, Any], city_id: int) -> Pollution:
-    components = data["components"]
-    return Pollution(
-        co=components["co"],
-        no=components["no"],
-        no2=components["no2"],
-        o3=components["o3"],
-        pm2_5=components["pm2_5"],
-        pm10=components["pm10"],
-        nh3=components["nh3"],
-        timestamp=data["dt"],
-        site_id=city_id,
-    )

@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi.testclient import TestClient
 
 from app.dependencies import get_db
@@ -14,14 +16,14 @@ class FakeDB:
     def rollback(self) -> None:
         return
 
-    def refresh(self, instance) -> None:
+    def refresh(self, obj: object) -> None:
         return
 
     def flush(self) -> None:
         return
 
 
-def override_get_db(fake_db=None) -> None:
+def override_get_db(fake_db: Any) -> Any:
     return fake_db
 
 

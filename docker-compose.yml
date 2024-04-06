@@ -5,6 +5,7 @@ services:
     image: postgres:14-alpine
     volumes:
       - ./volumes/data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
       - ".env"
     ports:

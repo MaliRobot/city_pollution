@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Optional, List
 
 from pydantic import BaseModel, Field, field_validator
@@ -8,13 +8,13 @@ from app.schemas.city import City
 
 
 class BasePollution(BaseModel):
-    start: int = Field(..., description="Start time as timestamp")
-    end: int = Field(..., description="End time as timestamp")
+    start: date = Field(..., description="Start time as date")
+    end: date = Field(..., description="End time as date")
 
     @field_validator("start", "end")
-    def validate_timestamp(cls, value: int) -> Any:
-        unix_time_start = 0
-        current_time = datetime.now().timestamp()
+    def validate_timestamp(cls, value: date) -> Any:
+        unix_time_start = datetime.fromtimestamp(0).date()
+        current_time = datetime.now().date()
         if value < unix_time_start or value > current_time:
             raise ValueError(
                 "Timestamp must be within the valid range from the start of Unix time till now."
@@ -38,8 +38,8 @@ class PollutionItem(BaseModel):
     pm2: Optional[float] = None
     pm10: Optional[float]
     nh3: Optional[float]
-    timestamp: Optional[int]
-    site_id: int
+    date: Optional[date]
+    city_id: int
 
     class Config:
         from_attributes = True

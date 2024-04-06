@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, Float, ForeignKey
+from sqlalchemy import Table, Column, Integer, Float, ForeignKey, Date
 
 from .base import mapper_registry
 
@@ -14,6 +14,6 @@ pollution_table = Table(
     Column("pm2_5", Float),
     Column("pm10", Float),
     Column("nh3", Float),
-    Column("timestamp", Integer),
-    Column("site_id", ForeignKey("city.id", ondelete="CASCADE"), index=True),
+    Column("date", Date),
+    Column("city_id", ForeignKey("city.id", ondelete="CASCADE"), index=True),
 )

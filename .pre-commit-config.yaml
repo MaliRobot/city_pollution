@@ -8,10 +8,7 @@ repos:
     rev: v1.9.0
     hooks:
       - id: mypy
-        args: [ --strict ]
-        additional_dependencies:
-          - "pydantic>=2.6.4"
-        exclude: 'tests/.*'
+        additional_dependencies: [ pydantic, types-requests ]
 
   - repo: https://github.com/psf/black
     rev: 24.3.0
