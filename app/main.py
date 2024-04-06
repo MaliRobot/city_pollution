@@ -3,15 +3,15 @@ from typing import Dict
 import uvicorn
 from fastapi import FastAPI
 
-from app.routers import location, pollution
+from app.routers import pollution, city
 
 app = FastAPI()
 
 app.include_router(pollution.router)
-app.include_router(location.router)
+app.include_router(city.router)
 
 
-@app.get("/", operation_id="homepage")
+@app.get("/", operation_id="homepage", summary="Home Page")
 def homepage() -> Dict[str, str]:
     return {"message": "Ok"}
 

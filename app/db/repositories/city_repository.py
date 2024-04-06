@@ -19,7 +19,11 @@ class CityRepository:
         return city
 
     def search_city(self, city_name: str, lat: float, lon: float) -> City | None:
-        return self.db.query(City).filter_by(name=city_name, lat=lat, lon=lon).one_or_none()
+        return (
+            self.db.query(City)
+            .filter_by(name=city_name, lat=lat, lon=lon)
+            .one_or_none()
+        )
 
     def get_city_by_id(self, city_id: int) -> Optional[City]:
         return self.db.query(City).get(city_id)

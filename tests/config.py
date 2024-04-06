@@ -5,23 +5,23 @@ from app.main import app
 
 
 class FakeDB:
-    def add(self, object):
-        return object
+    def add(self, obj: object) -> object:
+        return obj
 
-    def commit(self):
+    def commit(self) -> None:
         return
 
-    def rollback(self):
+    def rollback(self) -> None:
         return
 
-    def refresh(self, instance):
+    def refresh(self, instance) -> None:
         return
 
-    def flush(self):
+    def flush(self) -> None:
         return
 
 
-def override_get_db(fake_db=None):
+def override_get_db(fake_db=None) -> None:
     return fake_db
 
 

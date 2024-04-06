@@ -33,5 +33,5 @@ class PollutionRepository:
             self.db.delete(pollution)
             self.db.commit()
 
-    def get_all_pollution(self) -> List:
+    def get_all_pollution(self) -> list[Pollution]:
         return self.db.query(Pollution).all()

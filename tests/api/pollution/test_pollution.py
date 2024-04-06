@@ -3,7 +3,7 @@ from datetime import datetime
 import httpx
 
 
-def test_valid_pollution_params():
+def test_valid_pollution_params() -> None:
     valid_params = {
         "lat": 40.7128,
         "lon": -74.0060,
@@ -14,7 +14,7 @@ def test_valid_pollution_params():
     assert response.status_code == 200
 
 
-def test_invalid_start_timestamp():
+def test_invalid_start_timestamp() -> None:
     invalid_start = {
         "lat": 40.7128,
         "lon": -74.0060,
@@ -25,13 +25,13 @@ def test_invalid_start_timestamp():
     assert response.status_code == 422
 
 
-def test_invalid_end_timestamp():
+def test_invalid_end_timestamp() -> None:
     invalid_end = {
         "lat": 40.7128,
         "lon": -74.0060,
         "start": int(datetime(2022, 1, 1).timestamp()),
         "end": int(datetime.now().timestamp())
-               + 3600,  # set end timestamp to 1 hour in the future
+        + 3600,  # set end timestamp to 1 hour in the future
         "name": "New City",
     }
     response = httpx.get("http://localhost:8000/api/pollution/", params=invalid_end)
@@ -42,7 +42,7 @@ def test_invalid_end_timestamp():
     assert response.status_code == 422
 
 
-def test_import_pollution_data():
+def test_import_pollution_data() -> None:
     pollution_payload = {
         "lat": 40.7128,
         "lon": -74.0060,
@@ -56,7 +56,7 @@ def test_import_pollution_data():
     assert response.status_code == 200
 
 
-def test_delete_pollution_data():
+def test_delete_pollution_data() -> None:
     query_params = {
         "lat": 40.7128,
         "lon": -74.0060,

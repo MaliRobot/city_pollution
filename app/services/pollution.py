@@ -7,11 +7,11 @@ from app.entities import Pollution
 
 
 async def fetch_pollution_by_coords(
-        lat: float,
-        lon: float,
-        start: int,
-        end: int,
-) -> List | None:
+    lat: float,
+    lon: float,
+    start: int,
+    end: int,
+) -> List[Pollution] | None:
     async with AsyncClient() as client:
         response = await client.get(
             f"{settings.openweather_url}?lat={lat}&lon={lon}&start={start}&end={end}&appid={settings.openweather_key}"
@@ -36,6 +36,6 @@ async def get_pollution_by_coords(lat: float, lon: float, start: int, end: int) 
 
 
 async def delete_pollution_by_coords(
-        lat: float, lon: float, start: int, end: int
+    lat: float, lon: float, start: int, end: int
 ) -> Dict:
     raise NotImplemented

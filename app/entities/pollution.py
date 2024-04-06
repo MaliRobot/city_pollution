@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional, Dict
 
 
 @dataclass
@@ -11,10 +12,10 @@ class Pollution:
     pm10: str
     nh3: str
     timestamp: int
-    id: int = None
+    id: Optional[int] = None
 
     @staticmethod
-    def from_raw_data(data):
+    def from_raw_data(data: Dict) -> "Pollution":
         components = data["components"]
         return Pollution(
             co=components["co"],

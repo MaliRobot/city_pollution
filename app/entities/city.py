@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional, Dict
 
 
 @dataclass
@@ -9,9 +10,10 @@ class City:
     lat: float
     lon: float
     county: str = None
+    id: Optional[int] = None
 
     @staticmethod
-    def from_raw_data(raw_data):
+    def from_raw_data(raw_data: Dict) -> Optional["City"]:
         data = raw_data["components"]
         if data["_type"] == "city":
             city_name = data.get("city") or data.get("town")
