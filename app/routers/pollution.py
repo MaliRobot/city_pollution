@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 
 from fastapi import APIRouter, Depends, Query, status, HTTPException
 
@@ -26,6 +26,9 @@ router = APIRouter(
     operation_id="get_pollution_by_coordinates",
     summary="Get pollution data by coordinates",
     response_model=PollutionItemList,
+    description="Get pollution data by coordinates provided that coordinates match any city or town."
+                "Loads only data from the database, ie, what is imported so far from external services."
+                "Has limit and offset parameters for possibility of pagination for front end"
 )
 async def get_pollution_data(
         lat: float = Query(..., description="Latitude", ge=-90, le=90),
@@ -36,10 +39,12 @@ async def get_pollution_data(
             lt=date.today(),
         ),
         end: date = Query(..., description="End time as timestamp", le=date.today()),
-        limit: int = Query(..., description="Limit results", le=100, default=None),
-        offset: int = Query(..., description="Offset results", default=None),
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
         db: Session = Depends(get_db),
 ) -> PollutionItemList:
+    limit = limit if limit is not None else None
+    offset = offset if offset is not None else None
     if end <= start:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -62,6 +67,10 @@ async def get_pollution_data(
     "/",
     operation_id="import_pollution_data_for_location",
     summary="Import pollution data",
+    description="Import pollution for given location. Location must match city or town"
+                "that is fetched from external service if it's not already in database"
+                "Then pollution data is fetched from external service. Old pollution data is deleted if"
+                "exists for a given city/town."
 )
 async def import_historical_pollution_by_coords(
         pollution_params: PollutionSchema, db: Session = Depends(get_db)
@@ -111,6 +120,7 @@ async def import_historical_pollution_by_coords(
     "/",
     operation_id="delete_pollution_data",
     summary="Delete pollution data",
+    description="Delete pollution data for given city and coordinates."
 )
 async def delete_pollution_data(
         lat: float = Query(..., description="Latitude", ge=-90, le=90),

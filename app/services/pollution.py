@@ -8,12 +8,26 @@ from app.services.openweather_service import get_pollution_data
 
 
 async def fetch_pollution_by_coords(
-    lat: float,
-    lon: float,
-    start: int,
-    end: int,
-    city_id: int,
+        lat: float,
+        lon: float,
+        start: int,
+        end: int,
+        city_id: int,
 ) -> List[Pollution] | None:
+    """
+    Get pollution data for a given city, coordinates and time range
+    :param lat: Latitude of the location of interest
+    :type: float
+    :param lon: Longitude of the location of interest
+    :type: float
+    :param start: Start timestamp
+    :type: int
+    :param end: End timestamp
+    :type: int
+    :param city_id: ID of the city from our database - need to assign it to pollution entities
+    :type: int
+    :return:
+    """
     pollution_data_list = await get_pollution_data(lat, lon, start, end)
     if pollution_data_list is None:
         return None
@@ -21,8 +35,19 @@ async def fetch_pollution_by_coords(
 
 
 async def pollution_to_dataframe(
-    pollution_data_list: List[Dict], city_id: int
+        pollution_data_list: List[Dict], city_id: int
 ) -> List[Pollution]:
+    """
+    Process dictionaries with pollution data using dataframe
+    to aggregate pollution by date, performing mean of every
+    float column in the pollution, and instantiating rows
+    as Pollution objects
+    :param pollution_data_list: List with dictionaries with fetched pollution data from external service
+    :type pollution_data_list: List[Dict]
+    :param city_id: ID of the city we are interested in
+    :type city_id: int
+    :return:
+    """
     df = DataFrame(pollution_data_list)
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
 
