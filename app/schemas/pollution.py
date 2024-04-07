@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Any, Optional, List
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from pydantic_extra_types.coordinate import Longitude, Latitude
 
 from app.schemas.city import City
@@ -41,8 +41,9 @@ class PollutionItem(BaseModel):
     date: Optional[date]
     city_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+    # class Config:
+    #     from_attributes = True
 
 
 class PollutionItemList(BaseModel):

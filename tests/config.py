@@ -1,5 +1,3 @@
-from typing import Any
-
 from fastapi.testclient import TestClient
 
 from app.dependencies import get_db
@@ -23,7 +21,7 @@ class FakeDB:
         return
 
 
-def override_get_db(fake_db: Any) -> Any:
+def override_get_db(fake_db=None):
     return fake_db
 
 

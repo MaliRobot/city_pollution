@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from typing import Optional, Dict, Any, Type
 
+from app.db.repositories.interfaces.city_repository import ICityRepository
 from app.dependencies import Session
 from app.entities.city import City
 
 
 @dataclass
-class CityRepository:
+class CityRepository(ICityRepository):
     db: Session
 
     def create_city(self, city: City) -> City:

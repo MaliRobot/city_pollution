@@ -35,11 +35,11 @@ from app.entities import Pollution
 
 
 async def fetch_pollution_by_coords(
-        lat: float,
-        lon: float,
-        start: int,
-        end: int,
-        city_id: int,
+    lat: float,
+    lon: float,
+    start: int,
+    end: int,
+    city_id: int,
 ) -> List[Pollution] | None:
     async with AsyncClient() as client:
         response = await client.get(
@@ -55,19 +55,19 @@ async def fetch_pollution_by_coords(
                 pollutions_list.append(d)
 
             df = DataFrame(pollutions_list)
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
+            df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
 
             # Convert 'timestamp' column to separate date and time columns
-            df['date'] = df['timestamp'].dt.date
+            df["date"] = df["timestamp"].dt.date
 
             # get float columns
-            float_columns = df.select_dtypes(include=['float']).columns
+            float_columns = df.select_dtypes(include=["float"]).columns
 
             # fill the missing values with mean values
             df[float_columns] = df[float_columns].fillna(df[float_columns].mean())
 
             # group by date and calculate mean values
-            df_daily_mean = df.groupby('date').mean()
+            df_daily_mean = df.groupby("date").mean()
 
             # round float values to 2 decimals
             df_daily_mean = df_daily_mean.round(2)

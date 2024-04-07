@@ -10,6 +10,7 @@ class City:
     country: str
     lat: float
     lon: float
+    time_created: Optional[int]
     county: Optional[str] = None
 
 

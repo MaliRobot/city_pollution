@@ -36,6 +36,8 @@ async def get_pollution_data(
             lt=date.today(),
         ),
         end: date = Query(..., description="End time as timestamp", le=date.today()),
+        limit: int = Query(..., description="Limit results", le=100, default=None),
+        offset: int = Query(..., description="Offset results", default=None),
         db: Session = Depends(get_db),
 ) -> PollutionItemList:
     if end <= start:
@@ -48,10 +50,10 @@ async def get_pollution_data(
 
     if city is not None and city.id is not None:
         pollution_repo = PollutionRepository(db)
-        pollution = pollution_repo.get_pollution(start, end, city.id)
+        pollution = pollution_repo.get_pollution(start, end, city.id, limit, offset)
         return PollutionItemList(
-            data=[PollutionItem.from_orm(x) for x in pollution],
-            city=CitySchema.from_orm(city),
+            data=[PollutionItem.model_validate(x) for x in pollution],
+            city=CitySchema.model_validate(city),
         )
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
 
