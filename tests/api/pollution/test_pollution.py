@@ -4,8 +4,8 @@ from typing import List
 from pytest_mock import MockerFixture
 
 from data_project.entities import City, Pollution
-from data_project.tests.config import client
-from data_project.tests.repositories.pollution import PollutionFactory
+from tests.config import client
+from tests.repositories.pollution import PollutionFactory
 
 
 def test_valid_pollution_params(

@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     postgres_name: str = ""
     postgres_user: str = ""
     postgres_host: str = ""
+    postgres_port: str = ""
     postgres_password: str = ""
     opencage_url: str = ""
     opencage_key: str = ""

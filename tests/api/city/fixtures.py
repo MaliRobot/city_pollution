@@ -1,6 +1,6 @@
 import pytest
 
-from data_project.tests.repositories.city import CityRepositoryPrepopulated
+from tests.repositories.city import CityRepositoryPrepopulated
 
 
 @pytest.fixture

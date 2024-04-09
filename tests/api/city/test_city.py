@@ -1,6 +1,6 @@
 from pytest_mock import MockerFixture
 
-from data_project.tests.config import client
+from tests.config import client
 
 
 def test_get_city_coords_by_name(

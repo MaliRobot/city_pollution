@@ -1,7 +1,7 @@
 import pytest
 
-from data_project.tests.repositories.city import CityRepositoryPrepopulated
-from data_project.tests.repositories.pollution import PollutionRepositoryPrepopulated
+from tests.repositories.city import CityRepositoryPrepopulated
+from tests.repositories.pollution import PollutionRepositoryPrepopulated
 
 
 @pytest.fixture
