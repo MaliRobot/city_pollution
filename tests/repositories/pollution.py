@@ -75,15 +75,15 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
     def get_pollution(self, start: date, end: date, city_id: int, limit: int = None, offset: int = None) -> List[
         Pollution
     ]:
+        result = [x for x in self.pollutions if x.city_id == city_id and (start <= x.date <= end)]
+
         if offset:
-            pollutions = self.pollutions[offset:]
-        else:
-            pollutions = self.pollutions
+            result = result[offset:]
 
         if limit is not None:
-            pollutions = pollutions[:limit]
+            result = result[:limit]
 
-        return pollutions
+        return result
 
     def create_pollution(self, pollution_data: List[Pollution]) -> None:
         self.pollutions.extend(pollution_data)

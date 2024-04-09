@@ -51,5 +51,4 @@ async def test_pollution_to_dataframe():
             city_id=city_id,
         ),
     ]
-
     assert pollutions == expected_pollutions

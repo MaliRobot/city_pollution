@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import List, Optional, Dict, Any, Type
+from typing import List, Optional, Dict, Any
 
 from sqlalchemy import and_
 
@@ -20,8 +20,9 @@ class PollutionRepository(IPollutionRepository):
     def get_pollution_by_id(self, pollution_id: int) -> Any:
         return self.db.query(Pollution).get(pollution_id)
 
-    def get_pollution(self, start: date, end: date, city_id: int, limit: int = None, offset: int = None) -> list[
-        Type[Pollution]]:
+    def get_pollution(self, start: date, end: date, city_id: int, limit: int = None, offset: int = None) -> List[
+        Pollution
+    ]:
         query = self.db.query(Pollution).filter(
             Pollution.city_id == city_id,
             and_(

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Dict, Any, Type
+from typing import Optional, Dict, Any, List
 
 from app.db.repositories.interfaces.city_repository import ICityRepository
 from app.dependencies import Session
@@ -37,13 +37,15 @@ class CityRepository(ICityRepository):
         self.db.query(City).filter_by(id=city_id).update(**city_data)
         self.db.flush()
 
-    def delete_city(self, city_id: int) -> None:
+    def delete_city(self, city_id: int) -> bool:
         city = self.get_city_by_id(city_id)
         if city is not None:
             self.db.delete(city)
             self.db.commit()
+            return True
+        return False
 
-    def get_cities(self, limit: int, offset: int) -> list[Type[City]]:
+    def get_cities(self, limit: int, offset: int) -> List[City]:
         query = self.db.query(City)
         if offset is not None:
             query = query.offset(offset)

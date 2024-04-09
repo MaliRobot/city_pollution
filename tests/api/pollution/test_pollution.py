@@ -5,29 +5,17 @@ from pytest_mock import MockerFixture
 
 from app.entities import City, Pollution
 from tests.config import client
-from tests.repositories.city import CityRepositoryPrepopulated
-from tests.repositories.pollution import PollutionRepositoryPrepopulated, PollutionFactory
+from tests.repositories.pollution import PollutionFactory
 
 
-def test_valid_pollution_params(mocker: MockerFixture) -> None:
-    mocker.patch(
-        "app.routers.pollution.PollutionRepository",
-        PollutionRepositoryPrepopulated,
-    )
-    mocker.patch(
-        "app.routers.pollution.CityRepository",
-        CityRepositoryPrepopulated,
-    )
-
+def test_valid_pollution_params(mock_pollution_repository, mock_city_repository) -> None:
     valid_params = {
-        "lat": 40.53,
-        "lon": -74.56,
+        "city_id": 1,
         "start": date(2024, 1, 1),
         "end": date(2024, 1, 2),
     }
 
     response = client.get("api/pollution/", params=valid_params)
-
     assert response.status_code == 200
     data = response.json()
     assert data["city"]["lat"] == 40.53
@@ -38,19 +26,9 @@ def test_valid_pollution_params(mocker: MockerFixture) -> None:
     assert set([x["city_id"] for x in data["data"]]) == {data["city"]["id"]}
 
 
-def test_valid_pollution_params_no_data(mocker: MockerFixture) -> None:
-    mocker.patch(
-        "app.routers.pollution.PollutionRepository",
-        PollutionRepositoryPrepopulated,
-    )
-    mocker.patch(
-        "app.routers.pollution.CityRepository",
-        CityRepositoryPrepopulated,
-    )
-
+def test_valid_pollution_params_no_data(mock_pollution_repository, mock_city_repository, mocker: MockerFixture) -> None:
     valid_params = {
-        "lat": 40.53,
-        "lon": -74.56,
+        "city_id": 1,
         "start": date(2023, 1, 1),
         "end": date(2023, 1, 2),
     }
@@ -63,45 +41,33 @@ def test_valid_pollution_params_no_data(mocker: MockerFixture) -> None:
 
 def test_get_pollution_invalid_start_timestamp() -> None:
     invalid_start = {
-        "lat": 40.7128,
-        "lon": -74.0060,
+        "city_id": 1,
         "start": datetime(2024, 2, 1).date(),
         "end": datetime(2024, 1, 2).date(),
     }
     response = client.get("api/pollution/", params=invalid_start)
     assert response.status_code == 422
-    assert response.json() == {'detail': 'End time must be greater than start time'}
+    assert response.json() == {'detail': 'End date must be greater than or equal to start date'}
 
 
 def test_get_pollution_invalid_end_timestamp() -> None:
     invalid_end = {
-        "lat": 40.7128,
-        "lon": -74.0060,
+        "city_id": 1,
         "start": date(2024, 1, 1),
         "end": date(2999, 1, 2),
         "name": "New City",
     }
     response = client.get("api/pollution/", params=invalid_end)
     assert response.status_code == 422
-    assert response.json()['detail'][0]['msg'] == 'Input should be less than or equal to 2024-04-07'
+    assert response.json()['detail'] == f'End date cannot be in the future'
 
     invalid_end["end"] = date(1999, 1, 1)
     response = client.get("api/pollution/", params=invalid_end)
     assert response.status_code == 422
-    assert response.json() == {'detail': 'End time must be greater than start time'}
+    assert response.json() == {'detail': 'End date must be greater than or equal to start date'}
 
 
-def test_import_pollution_data(mocker: MockerFixture) -> None:
-    mocker.patch(
-        "app.routers.pollution.PollutionRepository",
-        PollutionRepositoryPrepopulated,
-    )
-    mocker.patch(
-        # "app.routers.pollution.CityRepository",
-        "app.routers.pollution.CityRepository",
-        CityRepositoryPrepopulated,
-    )
-
+def test_import_pollution_data(mock_pollution_repository, mock_city_repository, mocker: MockerFixture) -> None:
     async def fake_get_city(lat: float, lon: float, name: str) -> City | None:
         return City(id=None, lat=lat, lon=lon, name=name, country="US", county="", state="California", time_created=0)
 
@@ -131,8 +97,10 @@ def test_import_pollution_data(mocker: MockerFixture) -> None:
     pollution_payload = {
         "lat": 40.7128,
         "lon": -74.0060,
-        "start": date(2024, 1, 1).strftime("%Y-%m-%d"),
-        "end": date(2024, 2, 1).strftime("%Y-%m-%d"),
+        "dates": {
+            "start": date(2024, 1, 1).strftime("%Y-%m-%d"),
+            "end": date(2024, 2, 1).strftime("%Y-%m-%d"),
+        },
         "name": "New City",
     }
     response = client.post(
@@ -146,8 +114,10 @@ def test_import_pollution_data(mocker: MockerFixture) -> None:
     pollution_payload = {
         "lat": 40.53,
         "lon": -74.56,
-        "start": date(2023, 1, 1).strftime("%Y-%m-%d"),
-        "end": date(2023, 1, 2).strftime("%Y-%m-%d"),
+        "dates": {
+            "start": date(2023, 1, 1).strftime("%Y-%m-%d"),
+            "end": date(2023, 1, 2).strftime("%Y-%m-%d"),
+        },
         "name": "San Francisco",
     }
     response = client.post(
@@ -169,8 +139,10 @@ def test_import_pollution_data(mocker: MockerFixture) -> None:
     pollution_payload = {
         "lat": 40.53,
         "lon": -74.56,
-        "start": date(2023, 3, 1).strftime("%Y-%m-%d"),
-        "end": date(2023, 3, 2).strftime("%Y-%m-%d"),
+        "dates": {
+            "start": date(2023, 3, 1).strftime("%Y-%m-%d"),
+            "end": date(2023, 3, 2).strftime("%Y-%m-%d"),
+        },
         "name": "San Francisco",
     }
     response = client.post(
@@ -181,16 +153,7 @@ def test_import_pollution_data(mocker: MockerFixture) -> None:
     assert response.json() == {'detail': 'Pollution data not found'}
 
 
-def test_delete_pollution_data(mocker: MockerFixture) -> None:
-    mocker.patch(
-        "app.routers.pollution.PollutionRepository",
-        PollutionRepositoryPrepopulated,
-    )
-    mocker.patch(
-        "app.routers.pollution.CityRepository",
-        CityRepositoryPrepopulated,
-    )
-
+def test_delete_pollution_data(mock_pollution_repository, mock_city_repository) -> None:
     query_params = {
         "lat": 40.53,
         "lon": -74.56,

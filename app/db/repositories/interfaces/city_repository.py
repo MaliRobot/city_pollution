@@ -26,7 +26,7 @@ class ICityRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def delete_city(self, city_id: int) -> None:
+    def delete_city(self, city_id: int) -> bool:
         raise NotImplementedError
 
     @abstractmethod

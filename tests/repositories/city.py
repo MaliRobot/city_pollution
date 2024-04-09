@@ -97,14 +97,12 @@ class CityRepositoryPrepopulated(ICityRepository):
                 city.time_updated = datetime.now().date()
                 break
 
-    def delete_city(self, city_id: int) -> None:
-        temp = self.cities
+    def delete_city(self, city_id: int) -> bool:
         for city in self.cities:
             if city.id == city_id:
-                continue
-            else:
-                temp.remove(city)
-        self.cities = temp
+                self.cities.remove(city)
+                return True
+        return False
 
     def get_cities(self, limit: int, offset: int) -> List[City]:
         if offset:
