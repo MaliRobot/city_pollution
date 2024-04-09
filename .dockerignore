@@ -1,0 +1,5 @@
+.venv/
+bin/
+.git/
+.idea/
+.vs_code

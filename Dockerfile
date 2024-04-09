@@ -1,52 +1,48 @@
-FROM python:3.12-slim as python-base
+FROM python:3.12-alpine as base
 
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    POETRY_VERSION=1.8.2 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_NO_INTERACTION=1 \
-    PYSETUP_PATH="/opt/pysetup" \
-    VENV_PATH="/opt/pysetup/.venv"
+#ARG DEV=false
+ENV VIRTUAL_ENV=/app/.venv \
+    PATH="/app/.venv/bin:$PATH"
 
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+RUN apk update && \
+    apk add libpq
 
-FROM python-base as builder-base
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
-        # deps for installing poetry
-        curl \
-        # deps for building python deps
-        build-essential
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
+FROM base as builder
 
-WORKDIR $PYSETUP_PATH
-COPY poetry.lock pyproject.toml ./
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_VIRTUALENVS_CREATE=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
-RUN poetry install --no-dev
+RUN apk update && \
+    apk add musl-dev build-base gcc gfortran openblas-dev
 
-COPY .env /app/.env
+RUN apk --no-cache add curl
 
-FROM python-base as development
-ENV FASTAPI_ENV=development
-WORKDIR $PYSETUP_PATH
+WORKDIR /app
 
-COPY --from=builder-base $POETRY_HOME $POETRY_HOME
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+# Install Poetry
+RUN pip install poetry==1.8.2
+
+## Install the app
+COPY pyproject.toml poetry.lock ./
+#RUN if [ $DEV ]; then \
+#      poetry install --with dev --no-root && rm -rf $POETRY_CACHE_DIR; \
+#    else \
+#      poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR; \
+#    fi
 
 RUN poetry install
 
+FROM base as runtime
+
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
 WORKDIR /app
 
-COPY . .
-ENTRYPOINT [ "/app/entrypoint.sh" ]
+COPY ./data_project ./data_project
+COPY ./alembic.ini ./alembic.ini
+COPY ./entrypoint.sh ./entrypoint.sh
 
-
-FROM python-base as production
-ENV FASTAPI_ENV=production
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-COPY ./app /app/
-WORKDIR /app
-RUN pip install gunicorn
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "app.main:app"]
+ENTRYPOINT ["./entrypoint.sh"]

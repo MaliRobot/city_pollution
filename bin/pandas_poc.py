@@ -4,8 +4,8 @@ import pandas as pd
 from httpx import AsyncClient
 from pandas import DataFrame
 
-from app.config.settings import settings
-from app.entities import Pollution
+from data_project.config.settings import settings
+from data_project.entities import Pollution
 
 
 #
@@ -35,11 +35,11 @@ from app.entities import Pollution
 
 
 async def fetch_pollution_by_coords(
-    lat: float,
-    lon: float,
-    start: int,
-    end: int,
-    city_id: int,
+        lat: float,
+        lon: float,
+        start: int,
+        end: int,
+        city_id: int,
 ) -> List[Pollution] | None:
     async with AsyncClient() as client:
         response = await client.get(
