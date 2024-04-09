@@ -2,10 +2,10 @@ from datetime import datetime, date
 from typing import List
 
 from pytest_mock import MockerFixture
-from tests.config import client
 
 from data_project.entities import City, Pollution
-from data_project.tests.repositories import PollutionFactory
+from data_project.tests.config import client
+from data_project.tests.repositories.pollution import PollutionFactory
 
 
 def test_valid_pollution_params(

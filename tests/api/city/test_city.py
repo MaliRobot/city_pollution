@@ -1,6 +1,6 @@
 from pytest_mock import MockerFixture
 
-from tests.config import client
+from data_project.tests.config import client
 
 
 def test_get_city_coords_by_name(
@@ -27,6 +27,5 @@ def test_delete_city_by_id_success(mock_city_repository_for_city_router) -> None
 
 def test_delete_city_by_id_failure(mock_city_repository_for_city_router) -> None:
     response = client.delete("api/city/999/")
-    print(response.json())
     assert response.status_code == 404
     assert response.json() == {"detail": "Delete failed, city not found"}
