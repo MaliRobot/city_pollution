@@ -45,7 +45,9 @@ class CityRepository(ICityRepository):
             return True
         return False
 
-    def get_cities(self, limit: int, offset: int) -> List[City]:
+    def get_cities(
+        self, limit: Optional[int] = None, offset: Optional[int] = None
+    ) -> List[City]:
         query = self.db.query(City)
         if offset is not None:
             query = query.offset(offset)

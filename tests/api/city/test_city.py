@@ -5,7 +5,7 @@ from tests.config import client
 
 
 def test_get_city_coords_by_name(
-        mock_city_repository_for_city_router, mocker: MockerFixture
+    mock_city_repository_for_city_router, mocker: MockerFixture
 ) -> None:
     async def get_fake_city_by_name(city_name: str) -> City:
         return City(

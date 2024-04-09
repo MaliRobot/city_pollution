@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any, Type
+from typing import Optional, Dict, Any, List
 
 from city_pollution.entities.city import City
 
@@ -30,5 +30,7 @@ class ICityRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_cities(self, limit: int, offset: int) -> list[Type[City]]:
+    def get_cities(
+        self, limit: Optional[int] = None, offset: Optional[int] = None
+    ) -> List[City]:
         raise NotImplementedError
