@@ -36,8 +36,7 @@ jobs:
 
       - name: Run tests
         run: |
-          source .venv/bin/activate
-          pytest tests/
+          poetry run pytest
 
       - name: Check code style
         run: |
