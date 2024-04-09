@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional, Dict, Any, List
 
-from data_project.db.repositories.interfaces.city_repository import ICityRepository
-from data_project.dependencies import Session
-from data_project.entities.city import City
+from city_pollution.db.repositories.interfaces.city_repository import ICityRepository
+from city_pollution.dependencies import Session
+from city_pollution.entities.city import City
 
 
 @dataclass

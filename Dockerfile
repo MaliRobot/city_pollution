@@ -41,7 +41,7 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /app
 
-COPY ./data_project ./data_project
+COPY city_pollution ./city_pollution
 COPY ./alembic.ini ./alembic.ini
 COPY ./entrypoint.sh ./entrypoint.sh
 

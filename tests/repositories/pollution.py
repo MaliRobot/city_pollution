@@ -2,8 +2,8 @@ import random
 from datetime import date
 from typing import ClassVar, List, Optional, Dict, Any
 
-from data_project.db.repositories.interfaces.pollution_repository import IPollutionRepository
-from data_project.entities import Pollution
+from city_pollution.db.repositories.interfaces.pollution_repository import IPollutionRepository
+from city_pollution.entities import Pollution
 
 
 class PollutionFactory:

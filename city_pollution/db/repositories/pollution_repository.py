@@ -4,9 +4,9 @@ from typing import List, Optional, Dict, Any
 
 from sqlalchemy import and_
 
-from data_project.db.repositories.interfaces.pollution_repository import IPollutionRepository
-from data_project.dependencies import Session
-from data_project.entities.pollution import Pollution
+from city_pollution.db.repositories.interfaces.pollution_repository import IPollutionRepository
+from city_pollution.dependencies import Session
+from city_pollution.entities.pollution import Pollution
 
 
 @dataclass

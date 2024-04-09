@@ -3,8 +3,8 @@ from typing import Iterator
 from opencage.geocoder import OpenCageGeocode
 from sqlalchemy.orm import Session
 
-from data_project.config.settings import settings
-from data_project.db.connection import session_maker
+from city_pollution.config.settings import settings
+from city_pollution.db.connection import session_maker
 
 
 def get_db() -> Iterator[Session]:
