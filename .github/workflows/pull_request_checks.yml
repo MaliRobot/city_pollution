@@ -26,6 +26,7 @@ jobs:
 
       - name: Run tests
         run: |
+          poetry add pytest
           poetry run pytest
 
       - name: Check code style
