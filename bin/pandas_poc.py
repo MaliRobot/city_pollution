@@ -4,8 +4,8 @@ import pandas as pd
 from httpx import AsyncClient
 from pandas import DataFrame
 
-from data_project.config.settings import settings
-from data_project.entities import Pollution
+from city_pollution.config.settings import settings
+from city_pollution.entities import Pollution
 
 
 #

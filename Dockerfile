@@ -27,11 +27,6 @@ RUN pip install poetry==1.8.2
 
 ## Install the app
 COPY pyproject.toml poetry.lock ./
-#RUN if [ $DEV ]; then \
-#      poetry install --with dev --no-root && rm -rf $POETRY_CACHE_DIR; \
-#    else \
-#      poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR; \
-#    fi
 
 RUN poetry install
 
@@ -41,7 +36,7 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 WORKDIR /app
 
-COPY ./data_project ./data_project
+COPY city_pollution ./city_pollution
 COPY ./alembic.ini ./alembic.ini
 COPY ./entrypoint.sh ./entrypoint.sh
 

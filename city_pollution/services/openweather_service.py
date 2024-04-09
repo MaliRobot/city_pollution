@@ -3,7 +3,7 @@ from typing import List, Dict, Any
 from fastapi import HTTPException
 from httpx import AsyncClient
 
-from data_project.config.settings import settings
+from city_pollution.config.settings import settings
 
 
 async def get_pollution_data(

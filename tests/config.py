@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
-from data_project.dependencies import get_db
-from data_project.main import app
+from city_pollution.dependencies import get_db
+from city_pollution.main import app
 
 
 class FakeDB:

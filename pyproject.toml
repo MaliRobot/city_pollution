@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "data_project"
+name = "city_pollution"
 version = "0.1.0"
 description = ""
 authors = ["Milos Trifunovic <milos.trifunovic@gmail.com>"]

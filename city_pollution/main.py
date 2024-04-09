@@ -3,7 +3,7 @@ from typing import Dict
 import uvicorn
 from fastapi import FastAPI
 
-from data_project.routers import pollution, city
+from city_pollution.routers import pollution, city
 
 app = FastAPI()
 

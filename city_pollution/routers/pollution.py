@@ -3,19 +3,19 @@ from typing import Dict, Union, Optional
 
 from fastapi import APIRouter, Depends, Query, status, HTTPException
 
-from data_project.db.repositories.city_repository import CityRepository
-from data_project.db.repositories.pollution_repository import PollutionRepository
-from data_project.dependencies import get_db, Session
-from data_project.schemas.city import City as CitySchema
-from data_project.schemas.pollution import (
+from city_pollution.db.repositories.city_repository import CityRepository
+from city_pollution.db.repositories.pollution_repository import PollutionRepository
+from city_pollution.dependencies import get_db, Session
+from city_pollution.schemas.city import City as CitySchema
+from city_pollution.schemas.pollution import (
     Pollution as PollutionSchema,
     PollutionItem,
     PollutionItemList,
     Dates,
     Aggregate,
 )
-from data_project.services.city import get_city
-from data_project.services.pollution import fetch_pollution_by_coords, aggregated_pollutions
+from city_pollution.services.city import get_city
+from city_pollution.services.pollution import fetch_pollution_by_coords, aggregated_pollutions
 
 router = APIRouter(
     prefix="/api/pollution",

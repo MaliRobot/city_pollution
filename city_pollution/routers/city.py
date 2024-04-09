@@ -2,10 +2,10 @@ from typing import Any, Optional, List
 
 from fastapi import APIRouter, Query, Depends, HTTPException
 
-from data_project.db.repositories.city_repository import CityRepository
-from data_project.dependencies import Session, get_db
-from data_project.schemas.city import City
-from data_project.services.city import get_city_by_name
+from city_pollution.db.repositories.city_repository import CityRepository
+from city_pollution.dependencies import Session, get_db
+from city_pollution.schemas.city import City
+from city_pollution.services.city import get_city_by_name
 
 router = APIRouter(
     prefix="/api/city",

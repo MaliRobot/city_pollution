@@ -3,9 +3,9 @@ from typing import List, Dict
 import pandas as pd
 from pandas import DataFrame
 
-from data_project.entities import Pollution
-from data_project.schemas.pollution import Aggregate
-from data_project.services.openweather_service import get_pollution_data
+from city_pollution.entities import Pollution
+from city_pollution.schemas.pollution import Aggregate
+from city_pollution.services.openweather_service import get_pollution_data
 
 
 async def fetch_pollution_by_coords(

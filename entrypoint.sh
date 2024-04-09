@@ -12,4 +12,4 @@ done
 
 alembic upgrade head
 
-uvicorn data_project.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn city_pollution.main:app --host 0.0.0.0 --port 8000 --reload

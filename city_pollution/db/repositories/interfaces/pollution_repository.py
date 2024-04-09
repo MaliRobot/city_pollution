@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import date
 from typing import List, Optional, Dict, Any
 
-from data_project.entities.pollution import Pollution
+from city_pollution.entities.pollution import Pollution
 
 
 class IPollutionRepository(ABC):

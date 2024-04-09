@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from data_project.config.settings import settings
+from city_pollution.config.settings import settings
 
 DATABASE_URL = settings.database_url
 

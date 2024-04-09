@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from pydantic import BaseModel, Field, ConfigDict, model_validator
 from pydantic_extra_types.coordinate import Longitude, Latitude
 
-from data_project.schemas.city import City
+from city_pollution.schemas.city import City
 
 
 class Dates(BaseModel):

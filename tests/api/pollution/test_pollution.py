@@ -3,7 +3,7 @@ from typing import List
 
 from pytest_mock import MockerFixture
 
-from data_project.entities import City, Pollution
+from city_pollution.entities import City, Pollution
 from tests.config import client
 from tests.repositories.pollution import PollutionFactory
 
@@ -91,7 +91,7 @@ def test_import_pollution_data(
         )
 
     mocker.patch(
-        "data_project.routers.pollution.get_city",
+        "city_pollution.routers.pollution.get_city",
         fake_get_city,
     )
 
@@ -110,7 +110,7 @@ def test_import_pollution_data(
         return pollutions
 
     mocker.patch(
-        "data_project.routers.pollution.fetch_pollution_by_coords",
+        "city_pollution.routers.pollution.fetch_pollution_by_coords",
         fetch_pollution_by_coords,
     )
 
@@ -155,7 +155,7 @@ def test_import_pollution_data(
         return []
 
     mocker.patch(
-        "data_project.routers.pollution.fetch_pollution_by_coords",
+        "city_pollution.routers.pollution.fetch_pollution_by_coords",
         fetch_pollution_by_coords,
     )
 

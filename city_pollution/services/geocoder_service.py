@@ -1,4 +1,4 @@
-from data_project.dependencies import get_geocoder
+from city_pollution.dependencies import get_geocoder
 
 
 async def get_reverse_geocode(lat: float, lon: float) -> dict:

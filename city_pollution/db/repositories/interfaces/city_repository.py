@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any, Type
 
-from data_project.entities.city import City
+from city_pollution.entities.city import City
 
 
 class ICityRepository(ABC):

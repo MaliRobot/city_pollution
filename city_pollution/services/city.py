@@ -1,7 +1,7 @@
 from typing import Dict
 
-from data_project.entities import City
-from data_project.services.geocoder_service import get_reverse_geocode, get_city_by_name
+from city_pollution.entities import City
+from city_pollution.services.geocoder_service import get_reverse_geocode, get_city_by_name
 
 TOLERANCE = 0.5
 

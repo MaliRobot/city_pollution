@@ -1,11 +1,25 @@
 from pytest_mock import MockerFixture
 
+from city_pollution.entities import City
 from tests.config import client
 
 
 def test_get_city_coords_by_name(
-        mock_city_repository_for_city_router, mocker: MockerFixture
+    mock_city_repository_for_city_router, mocker: MockerFixture
 ) -> None:
+    async def get_fake_city_by_name(city_name: str) -> City:
+        return City(
+            id=1,
+            name="New York",
+            country="US",
+            state="New York",
+            county="New York",
+            lat=45.45,
+            lon=45.45,
+        )
+
+    mocker.patch("city_pollution.routers.city.get_city_by_name", get_fake_city_by_name)
+
     valid_name = "New York"
     response = client.get("api/city/name/", params={"name": valid_name})
     assert response.status_code == 200
