@@ -5,7 +5,7 @@ from tests.config import client
 
 
 def test_get_city_coords_by_name(
-    mock_city_repository_for_city_router, mocker: MockerFixture
+        mock_city_repository_for_city_router, mocker: MockerFixture
 ) -> None:
     async def get_fake_city_by_name(city_name: str) -> City:
         return City(
@@ -23,7 +23,6 @@ def test_get_city_coords_by_name(
     valid_name = "New York"
     response = client.get("api/city/name/", params={"name": valid_name})
     assert response.status_code == 200
-    data = response.json()
 
     response = client.get("api/city/name/", params={"name": ""})
     assert response.status_code == 422
