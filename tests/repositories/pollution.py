@@ -69,13 +69,22 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
                 nh3=0.5,
                 date=date(2024, 1, 2),
                 city_id=2,
-            )
+            ),
         ]
 
-    def get_pollution(self, start: date, end: date, city_id: int, limit: int = None, offset: int = None) -> List[
-        Pollution
-    ]:
-        result = [x for x in self.pollutions if x.city_id == city_id and (start <= x.date <= end)]
+    def get_pollution(
+        self,
+        start: date,
+        end: date,
+        city_id: int,
+        limit: int = None,
+        offset: int = None,
+    ) -> List[Pollution]:
+        result = [
+            x
+            for x in self.pollutions
+            if x.city_id == city_id and (start <= x.date <= end)
+        ]
 
         if offset:
             result = result[offset:]
@@ -92,7 +101,9 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
         temp = []
         begin_len = len(self.pollutions)
         for pollution in self.pollutions:
-            if (pollution.date < start or pollution.date > end) or city_id != pollution.city_id:
+            if (
+                pollution.date < start or pollution.date > end
+            ) or city_id != pollution.city_id:
                 temp.append(pollution)
         self.pollutions = temp
         end_len = len(self.pollutions)
@@ -102,7 +113,7 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
         return self.db.query(Pollution).get(pollution_id)
 
     def update_pollution(
-            self, pollution_id: int, pollution_data: Dict[Any, Any]
+        self, pollution_id: int, pollution_data: Dict[Any, Any]
     ) -> Optional[Pollution]:
         for pollution in self.pollutions:
             if pollution.id == pollution_data.get(pollution.id):

@@ -2,10 +2,7 @@ import pytest
 
 from tests.config import override_get_db, app, get_db, FakeDB
 
-pytest_plugins = [
-    "tests.api.city.fixtures",
-    "tests.api.pollution.fixtures"
-]
+pytest_plugins = ["tests.api.city.fixtures", "tests.api.pollution.fixtures"]
 
 
 @pytest.fixture

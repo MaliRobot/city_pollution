@@ -6,11 +6,11 @@ from tests.config import client
 from tests.repositories.city import CityRepositoryPrepopulated
 
 
-def test_get_city_coords_by_name(mock_city_repository_for_city_router, mocker: MockerFixture) -> None:
+def test_get_city_coords_by_name(
+    mock_city_repository_for_city_router, mocker: MockerFixture
+) -> None:
     valid_name = "New York"
-    response = client.get(
-        "api/city/name/", params={"name": valid_name}
-    )
+    response = client.get("api/city/name/", params={"name": valid_name})
     assert response.status_code == 200
     data = response.json()
 
@@ -18,9 +18,7 @@ def test_get_city_coords_by_name(mock_city_repository_for_city_router, mocker: M
     assert response.status_code == 422
 
     long_name = "a" * 256
-    response = client.get(
-        "api/city/name/", params={"name": long_name}
-    )
+    response = client.get("api/city/name/", params={"name": long_name})
     assert response.status_code == 422
 
 

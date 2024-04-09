@@ -57,9 +57,9 @@ async def get_city(lat: float, lon: float, city_name: str) -> City | None:
 
         for city in cities:
             if (
-                    city is not None
-                    and abs(city.lat - lat) < TOLERANCE
-                    and abs(city.lon - lon) < TOLERANCE
+                city is not None
+                and abs(city.lat - lat) < TOLERANCE
+                and abs(city.lon - lon) < TOLERANCE
             ):
                 return city
     return None

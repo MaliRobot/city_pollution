@@ -12,10 +12,10 @@ class CityFactory:
     @classmethod
     def create(cls, lat: float = None, lon: float = None) -> City:
         cls._id += 1
-        city = f'name {random.randint(1, 100000)}'
-        state = f'state {random.randint(1, 100000)}'
-        country = f'country {random.randint(1, 100000)}'
-        county = f'county {random.randint(1, 100000)}'
+        city = f"name {random.randint(1, 100000)}"
+        state = f"state {random.randint(1, 100000)}"
+        country = f"country {random.randint(1, 100000)}"
+        county = f"county {random.randint(1, 100000)}"
         if lat is None:
             lat = random.uniform(-90.0, 90.0)
         if lon is None:
@@ -29,7 +29,7 @@ class CityFactory:
             county=county,
             lat=lat,
             lon=lon,
-            time_created=random.randint(1, 100000)
+            time_created=random.randint(1, 100000),
         )
 
 
@@ -55,7 +55,7 @@ class CityRepositoryPrepopulated(ICityRepository):
                 lat=21.02,
                 lon=-105.80,
                 time_created=176383940,
-            )
+            ),
         ]
 
     def create_city(self, city: City) -> City:

@@ -9,11 +9,11 @@ from app.services.openweather_service import get_pollution_data
 
 
 async def fetch_pollution_by_coords(
-        lat: float,
-        lon: float,
-        start: int,
-        end: int,
-        city_id: int,
+    lat: float,
+    lon: float,
+    start: int,
+    end: int,
+    city_id: int,
 ) -> List[Pollution] | None:
     """
     Get pollution data for a given city, coordinates and time range
@@ -36,7 +36,7 @@ async def fetch_pollution_by_coords(
 
 
 async def pollution_to_dataframe(
-        pollution_data_list: List[Dict], city_id: int
+    pollution_data_list: List[Dict], city_id: int
 ) -> List[Pollution]:
     """
     Process dictionaries with pollution data using dataframe
@@ -71,7 +71,9 @@ async def pollution_to_dataframe(
     return pandas_to_dataclasses(df_daily_mean, city_id)
 
 
-def aggregated_pollutions(pollution_data_list: List[Pollution], city_id: int, aggregate: str = None) -> List[Pollution]:
+def aggregated_pollutions(
+    pollution_data_list: List[Pollution], city_id: int, aggregate: str = None
+) -> List[Pollution]:
     """
     :param pollution_data_list: List with dictionaries with fetched pollution data from external service
     :type pollution_data_list: List[Dict]
@@ -82,22 +84,22 @@ def aggregated_pollutions(pollution_data_list: List[Pollution], city_id: int, ag
     """
     df = pd.DataFrame(pollution_data_list)
     # convert date to datetime
-    df['date'] = pd.to_datetime(df['date'])
+    df["date"] = pd.to_datetime(df["date"])
     # get all float columns
-    float_columns = df.select_dtypes(include='float').columns
+    float_columns = df.select_dtypes(include="float").columns
 
     if aggregate == Aggregate.MONTHLY.value:
-        freq = 'month'
-        period = 'M'
+        freq = "month"
+        period = "M"
     else:
-        freq = 'year'
-        period = 'Y'
+        freq = "year"
+        period = "Y"
 
     # group by freq and calculate mean value for float columns
-    df[freq] = df['date'].dt.to_period(period)
+    df[freq] = df["date"].dt.to_period(period)
     aggregated_df = df.groupby(freq)[float_columns].mean().reset_index()
     # convert the period index to datetime format with the first day of each month/year
-    aggregated_df['date'] = aggregated_df[freq].dt.to_timestamp()
+    aggregated_df["date"] = aggregated_df[freq].dt.to_timestamp()
 
     # drop intermediate freq column
     aggregated_df.drop(columns=[freq], inplace=True)

@@ -8,7 +8,9 @@ from tests.config import client
 from tests.repositories.pollution import PollutionFactory
 
 
-def test_valid_pollution_params(mock_pollution_repository, mock_city_repository) -> None:
+def test_valid_pollution_params(
+    mock_pollution_repository, mock_city_repository
+) -> None:
     valid_params = {
         "city_id": 1,
         "start": date(2024, 1, 1),
@@ -26,7 +28,9 @@ def test_valid_pollution_params(mock_pollution_repository, mock_city_repository)
     assert set([x["city_id"] for x in data["data"]]) == {data["city"]["id"]}
 
 
-def test_valid_pollution_params_no_data(mock_pollution_repository, mock_city_repository, mocker: MockerFixture) -> None:
+def test_valid_pollution_params_no_data(
+    mock_pollution_repository, mock_city_repository, mocker: MockerFixture
+) -> None:
     valid_params = {
         "city_id": 1,
         "start": date(2023, 1, 1),
@@ -35,7 +39,7 @@ def test_valid_pollution_params_no_data(mock_pollution_repository, mock_city_rep
 
     response = client.get("api/pollution/", params=valid_params)
     assert response.status_code == 200
-    assert response.json()['city']["name"] == "San Francisco"
+    assert response.json()["city"]["name"] == "San Francisco"
     assert len(response.json()["data"]) == 0
 
 
@@ -47,7 +51,9 @@ def test_get_pollution_invalid_start_timestamp() -> None:
     }
     response = client.get("api/pollution/", params=invalid_start)
     assert response.status_code == 422
-    assert response.json() == {'detail': 'End date must be greater than or equal to start date'}
+    assert response.json() == {
+        "detail": "End date must be greater than or equal to start date"
+    }
 
 
 def test_get_pollution_invalid_end_timestamp() -> None:
@@ -59,24 +65,39 @@ def test_get_pollution_invalid_end_timestamp() -> None:
     }
     response = client.get("api/pollution/", params=invalid_end)
     assert response.status_code == 422
-    assert response.json()['detail'] == f'End date cannot be in the future'
+    assert response.json()["detail"] == f"End date cannot be in the future"
 
     invalid_end["end"] = date(1999, 1, 1)
     response = client.get("api/pollution/", params=invalid_end)
     assert response.status_code == 422
-    assert response.json() == {'detail': 'End date must be greater than or equal to start date'}
+    assert response.json() == {
+        "detail": "End date must be greater than or equal to start date"
+    }
 
 
-def test_import_pollution_data(mock_pollution_repository, mock_city_repository, mocker: MockerFixture) -> None:
+def test_import_pollution_data(
+    mock_pollution_repository, mock_city_repository, mocker: MockerFixture
+) -> None:
     async def fake_get_city(lat: float, lon: float, name: str) -> City | None:
-        return City(id=None, lat=lat, lon=lon, name=name, country="US", county="", state="California", time_created=0)
+        return City(
+            id=None,
+            lat=lat,
+            lon=lon,
+            name=name,
+            country="US",
+            county="",
+            state="California",
+            time_created=0,
+        )
 
     mocker.patch(
         "app.routers.pollution.get_city",
         fake_get_city,
     )
 
-    async def fetch_pollution_by_coords(lat: float, lon: float, start: int, end: int, city_id: int) -> List[Pollution]:
+    async def fetch_pollution_by_coords(
+        lat: float, lon: float, start: int, end: int, city_id: int
+    ) -> List[Pollution]:
         pollutions = []
         p_date = start
         while True:
@@ -103,12 +124,12 @@ def test_import_pollution_data(mock_pollution_repository, mock_city_repository, 
         },
         "name": "New City",
     }
-    response = client.post(
-        "api/pollution/", json=pollution_payload
-    )
+    response = client.post("api/pollution/", json=pollution_payload)
 
     assert response.status_code == 200
-    assert response.json() == {'success': 'pollution data imported for city New City at coords 40.7128 -74.006'}
+    assert response.json() == {
+        "success": "pollution data imported for city New City at coords 40.7128 -74.006"
+    }
 
     # get pollution for city that is already in db
     pollution_payload = {
@@ -120,15 +141,17 @@ def test_import_pollution_data(mock_pollution_repository, mock_city_repository, 
         },
         "name": "San Francisco",
     }
-    response = client.post(
-        "api/pollution/", json=pollution_payload
-    )
+    response = client.post("api/pollution/", json=pollution_payload)
 
     assert response.status_code == 200
-    assert response.json() == {'success': 'pollution data imported for city San Francisco at coords 40.53 -74.56'}
+    assert response.json() == {
+        "success": "pollution data imported for city San Francisco at coords 40.53 -74.56"
+    }
 
     # get pollution for city that is already in db but pollution data couldn't be fetched
-    async def fetch_pollution_by_coords(lat: float, lon: float, start: int, end: int, city_id: int) -> List:
+    async def fetch_pollution_by_coords(
+        lat: float, lon: float, start: int, end: int, city_id: int
+    ) -> List:
         return []
 
     mocker.patch(
@@ -145,12 +168,10 @@ def test_import_pollution_data(mock_pollution_repository, mock_city_repository, 
         },
         "name": "San Francisco",
     }
-    response = client.post(
-        "api/pollution/", json=pollution_payload
-    )
+    response = client.post("api/pollution/", json=pollution_payload)
 
     assert response.status_code == 404
-    assert response.json() == {'detail': 'Pollution data not found'}
+    assert response.json() == {"detail": "Pollution data not found"}
 
 
 def test_delete_pollution_data(mock_pollution_repository, mock_city_repository) -> None:
@@ -159,7 +180,7 @@ def test_delete_pollution_data(mock_pollution_repository, mock_city_repository) 
         "lon": -74.56,
         "start": date(2024, 1, 1),
         "end": date(2024, 1, 2),
-        "name": "San Francisco"
+        "name": "San Francisco",
     }
 
     response = client.delete("api/pollution/", params=query_params)
@@ -171,7 +192,7 @@ def test_delete_pollution_data(mock_pollution_repository, mock_city_repository) 
         "lon": -74.56,
         "start": date(2024, 2, 1),
         "end": date(2024, 2, 2),
-        "name": "San Francisco"
+        "name": "San Francisco",
     }
 
     # test deleting non existing pollution data
