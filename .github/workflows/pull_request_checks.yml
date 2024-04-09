@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.12
 
@@ -24,10 +24,15 @@ jobs:
           version: 1.8.2
           virtualenvs-create: true
           virtualenvs-in-project: false
+          virtualenvs-path: { cache-dir }/virtualenvs
+          installer-parallel: true
 
-      - name: Install dependencies
-        run: |
-          poetry install
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }
 
       - name: Run tests
         run: |
