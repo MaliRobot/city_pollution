@@ -34,7 +34,7 @@ jobs:
 
       - name: Linting
         run: |
-          poetry run mypy
+          poetry run mypy --config-file pyproject.toml
 
       - uses: psf/black@stable
         with:
