@@ -32,6 +32,10 @@ jobs:
           poetry add --dev pytest
           poetry run pytest
 
+      - name: Linting
+        run: |
+          poetry run mypy
+
       - uses: psf/black@stable
         with:
           options: "--check --verbose"
