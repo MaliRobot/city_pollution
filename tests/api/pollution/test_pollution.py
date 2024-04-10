@@ -9,7 +9,7 @@ from tests.repositories.pollution import PollutionFactory
 
 
 def test_valid_pollution_params(
-        mock_pollution_repository, mock_city_repository
+    mock_pollution_repository, mock_city_repository
 ) -> None:
     valid_params = {
         "city_id": 1,
@@ -29,7 +29,7 @@ def test_valid_pollution_params(
 
 
 def test_valid_pollution_params_no_data(
-        mock_pollution_repository, mock_city_repository, mocker: MockerFixture
+    mock_pollution_repository, mock_city_repository, mocker: MockerFixture
 ) -> None:
     valid_params = {
         "city_id": 1,
@@ -76,7 +76,7 @@ def test_get_pollution_invalid_end_timestamp() -> None:
 
 
 def test_import_pollution_data(
-        mock_pollution_repository, mock_city_repository, mocker: MockerFixture
+    mock_pollution_repository, mock_city_repository, mocker: MockerFixture
 ) -> None:
     async def fake_get_city(lat: float, lon: float, name: str) -> City | None:
         return City(
@@ -96,7 +96,7 @@ def test_import_pollution_data(
     )
 
     async def fetch_pollution_by_coords(
-            lat: float, lon: float, start: int, end: int, city_id: int
+        lat: float, lon: float, start: int, end: int, city_id: int
     ) -> List[Pollution]:
         pollutions = []
         p_date = start
@@ -150,7 +150,7 @@ def test_import_pollution_data(
 
     # get pollution for city that is already in db but pollution data couldn't be fetched
     async def fetch_pollution_by_coords(
-            lat: float, lon: float, start: int, end: int, city_id: int
+        lat: float, lon: float, start: int, end: int, city_id: int
     ) -> List:
         return []
 
@@ -176,8 +176,7 @@ def test_import_pollution_data(
 
 def test_delete_pollution_data(mock_pollution_repository, mock_city_repository) -> None:
     query_params = {
-        "lat": 40.53,
-        "lon": -74.56,
+        "city_id": 1,
         "start": date(2024, 1, 1),
         "end": date(2024, 1, 2),
         "name": "San Francisco",
@@ -188,8 +187,7 @@ def test_delete_pollution_data(mock_pollution_repository, mock_city_repository) 
     assert response.json() == {"success": True, "deleted": 2}
 
     query_params = {
-        "lat": 40.53,
-        "lon": -74.56,
+        "city_id": 1,
         "start": date(2024, 2, 1),
         "end": date(2024, 2, 2),
         "name": "San Francisco",
