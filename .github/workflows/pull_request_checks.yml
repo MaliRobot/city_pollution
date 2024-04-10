@@ -34,7 +34,7 @@ jobs:
 
       - name: Linting
         run: |
-          poetry run mypy --config-file pyproject.toml
+          poetry run mypy city_pollution --config-file pyproject.toml
 
       - uses: psf/black@stable
         with:
