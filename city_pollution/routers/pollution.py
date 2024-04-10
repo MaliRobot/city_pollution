@@ -1,11 +1,12 @@
 from datetime import datetime
-from typing import Dict, Union, Optional
+from typing import Dict, Union, Optional, List
 
 from fastapi import APIRouter, Depends, Query, status, HTTPException
 
 from city_pollution.db.repositories.city_repository import CityRepository
 from city_pollution.db.repositories.pollution_repository import PollutionRepository
 from city_pollution.dependencies import get_db, Session
+from city_pollution.entities import Pollution, City
 from city_pollution.schemas.city import City as CitySchema
 from city_pollution.schemas.pollution import (
     Pollution as PollutionSchema,
@@ -53,29 +54,42 @@ async def get_pollution_data(
             agg_pollution, gaps = aggregated_pollutions(
                 pollutions, city.id, aggregate.value
             )
-            return PollutionItemList(
-                data=[PollutionItem.model_validate(x) for x in agg_pollution],
-                city=CitySchema.model_validate(city),
-                start=dates.start,
-                end=dates.end,
-                gaps=gaps,
-            )
+            result = await pollution_response_handler(agg_pollution, city, gaps)
+            return result
 
         pollution = pollution_repo.get_pollution(
             dates.start, dates.end, city.id, limit, offset
         )
-
-        start = end = None
-        if len(pollution) > 0:
-            end = pollution[-1].date
-            start = pollution[0].date
-        return PollutionItemList(
-            data=[PollutionItem.model_validate(x) for x in pollution],
-            city=CitySchema.model_validate(city),
-            start=start,
-            end=end,
-        )
+        result = await pollution_response_handler(pollution, city)
+        return result
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+
+
+async def pollution_response_handler(
+    pollution: List[Pollution], city: City, gaps: bool = False
+) -> PollutionItemList:
+    """
+    Prepare response for pollution data request
+    :param pollution: List of Pollution instances
+    :type pollution: List[Pollution]
+    :param city: City instance
+    :type city: City
+    :param gaps: True if there is gap between the dates in the data, otherwise False or None
+    :type gaps: bool
+    :return: Returns PollutionItemList containing pollution data, date range for data and gaps flag
+    :rtype: List[PollutionItemList]
+    """
+    start_dt = end_dt = None
+    if len(pollution) > 0:
+        start_dt = pollution[0].date
+        end_dt = pollution[-1].date
+    return PollutionItemList(
+        data=[PollutionItem.model_validate(x) for x in pollution],
+        city=CitySchema.model_validate(city),
+        start=start_dt,
+        end=end_dt,
+        gaps=gaps,
+    )
 
 
 @router.post(
@@ -140,16 +154,15 @@ async def import_historical_pollution_by_coords(
     "/",
     operation_id="delete_pollution_data",
     summary="Delete pollution data",
-    description="Delete pollution data for given city and coordinates.",
+    description="Delete pollution data for given city.",
 )
 async def delete_pollution_data(
-    lat: float = Query(..., description="Latitude", ge=-90, le=90),
-    lon: float = Query(..., description="Longitude", ge=-180, le=180),
+    city_id: int,
     dates: Dates = Depends(),
     db: Session = Depends(get_db),
 ) -> Dict[str, Union[bool, int]]:
     city_repo = CityRepository(db)
-    city = city_repo.get_city_by_lat_and_lon(lat, lon)
+    city = city_repo.get_city_by_id(city_id)
     if city and city.id:
         pollution_repo = PollutionRepository(db)
         result = pollution_repo.delete_pollution_range(dates.start, dates.end, city.id)

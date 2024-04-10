@@ -1,22 +1,38 @@
+from typing import Dict, Any, List
+
 from pytest_mock import MockerFixture
 
-from city_pollution.entities import City
 from tests.config import client
 
 
 def test_get_city_coords_by_name(
     mock_city_repository_for_city_router, mocker: MockerFixture
 ) -> None:
-    async def get_fake_city_by_name(city_name: str) -> City:
-        return City(
-            id=1,
-            name="New York",
-            country="US",
-            state="New York",
-            county="New York",
-            lat=45.45,
-            lon=45.45,
-        )
+    async def get_fake_city_by_name(city_name: str) -> List[Dict[str, Any]]:
+        return [
+            {
+                "components": {
+                    "_category": "building",
+                    "_normalized_city": "Hanover",
+                    "_type": "building",
+                    "city": "Hanover",
+                    "city_district": "Vahrenwald-List",
+                    "continent": "Europe",
+                    "country": "Germany",
+                    "country_code": "de",
+                    "county": "Region Hannover",
+                    "house_number": "2",
+                    "office": "Design Offices",
+                    "political_union": "European Union",
+                    "postcode": "30165",
+                    "road": "Philipsbornstraße",
+                    "state": "Lower Saxony",
+                    "state_code": "NI",
+                    "suburb": "Vahrenwald",
+                },
+                "geometry": {"lat": 52.387783, "lng": 9.7334394},
+            }
+        ]
 
     mocker.patch("city_pollution.routers.city.get_city_by_name", get_fake_city_by_name)
 

@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from city_pollution.entities import City
 from city_pollution.services.geocoder_service import (
@@ -36,6 +36,16 @@ def city_from_raw_data(raw_data: Dict[Any, Any]) -> City | None:
     return None
 
 
+async def extract_cities_from_raw_data(
+    cities_raw_data: Dict[Any, Any]
+) -> List[City | None]:
+    return [
+        city_from_raw_data(loc)
+        for loc in cities_raw_data
+        if loc["components"]["_type"] in ["city", "town"]
+    ]
+
+
 async def get_city(lat: float, lon: float, city_name: str) -> City | None:
     """
     Search for the city using the geocoder with given city name,
@@ -52,11 +62,7 @@ async def get_city(lat: float, lon: float, city_name: str) -> City | None:
     city_by_name = await get_city_by_name(city_name)
     all_cities = city_by_name + city_by_geocode
     if all_cities is not None:
-        cities = [
-            city_from_raw_data(loc)
-            for loc in all_cities
-            if loc["components"]["_type"] in ["city", "town"]
-        ]
+        cities = await extract_cities_from_raw_data(all_cities)
 
         for city in cities:
             if (

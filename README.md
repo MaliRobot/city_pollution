@@ -45,10 +45,17 @@ docker compose build
 docker compose up
 ```
 
-You are all set, check endpoints at `/docs` 
+You are all set, check endpoints at `/docs`
 
+## How to
 
-
-
-
-
+- Start with `api/city/name` - just type the name of your city, a native or English name will suffice.
+- Check the response, if you find the city you are looking for, you can tell because country, state, and
+  other data will help you, take the longitude and latitude.
+- To get the data for your city, use `api/pollution` and send in the body longitude, latitude, and city name, as well as
+  a desired date range.
+- Now you can access data via GET `api/pollution` providing city name and date range as query params.
+- List can be aggregated by month or year, and if any gaps are detected in the data, it will be indicated by the `gaps`
+  flag.
+- The rest is up to you. You can import more data for your city or other cities, you can delete pollution data
+  and city data (the latter will delete pollution data as well).
