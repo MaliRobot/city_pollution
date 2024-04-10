@@ -40,4 +40,6 @@ COPY city_pollution ./city_pollution
 COPY ./alembic.ini ./alembic.ini
 COPY ./entrypoint.sh ./entrypoint.sh
 
+RUN chmod +x ./entrypoint.sh
+
 ENTRYPOINT ["./entrypoint.sh"]
