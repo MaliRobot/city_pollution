@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from datetime import date, datetime
 
 import pytest
@@ -57,6 +58,21 @@ async def test_pollution_to_dataframe():
         ),
     ]
     assert pollutions == expected_pollutions
+
+    start = 1704104579  # 1st of Jan 2024
+    city_id = 1
+    pollutions_list = []
+    for i in range(31):  # till 1st of April 2024
+        start_date = datetime.fromtimestamp(start).date()
+        pollution = PollutionFactory().create(start_date, city_id)
+        poll_dict = asdict(pollution)
+        poll_dict["timestamp"] = datetime.combine(
+            poll_dict["date"], datetime.min.time()
+        )
+        pollutions_list.append(poll_dict)
+        start += 3600 * 24  # day
+    result = await pollution_to_dataframe(pollutions_list, 1)
+    assert len(result) == 31
 
 
 @pytest.mark.asyncio
