@@ -83,6 +83,7 @@ class PollutionItemList(BaseModel):
     city: City
     start: Optional[date]
     end: Optional[date]
+    gaps: Optional[bool] = None
 
 
 class Aggregate(Enum):

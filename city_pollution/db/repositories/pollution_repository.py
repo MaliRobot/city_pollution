@@ -49,7 +49,7 @@ class PollutionRepository(IPollutionRepository):
     ) -> Pollution | None:
         pollution = self.get_pollution_by_id(pollution_id)
         if pollution:
-            for key, value in pollution_data:
+            for key, value in pollution_data.items():
                 setattr(pollution, key, value)
             self.db.commit()
             self.db.refresh(pollution)
