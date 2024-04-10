@@ -28,16 +28,14 @@ async def get_pollution_data(
         )
 
     if response.status_code == 200:
-        if response.status_code == 200:
-            pollutions_list = []
-            if len(response.json()["list"]) > 0:
-                pollutions = response.json()["list"]
-                for pollution in pollutions:
-                    d = pollution["components"]
-                    d["timestamp"] = pollution["dt"]
-                    pollutions_list.append(d)
-                return pollutions_list
-        return []
+        pollutions_list = []
+        if len(response.json()["list"]) > 0:
+            pollutions = response.json()["list"]
+            for pollution in pollutions:
+                d = pollution["components"]
+                d["timestamp"] = pollution["dt"]
+                pollutions_list.append(d)
+            return pollutions_list
     raise HTTPException(
         status_code=response.status_code, detail="Couldn't retrieve pollution data"
     )

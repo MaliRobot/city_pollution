@@ -6,7 +6,7 @@ from city_pollution.services.geocoder_service import (
     get_city_by_name,
 )
 
-TOLERANCE = 0.5
+TOLERANCE = 0.5  # degrees
 
 
 def city_from_raw_data(raw_data: Dict[Any, Any]) -> City | None:
