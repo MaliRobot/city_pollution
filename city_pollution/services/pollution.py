@@ -9,11 +9,11 @@ from city_pollution.services.openweather_service import get_pollution_data
 
 
 async def fetch_pollution_by_coords(
-        lat: float,
-        lon: float,
-        start: int,
-        end: int,
-        city_id: int,
+    lat: float,
+    lon: float,
+    start: int,
+    end: int,
+    city_id: int,
 ) -> List[Pollution] | None:
     """
     Get pollution data for a given city, coordinates and time range
@@ -36,7 +36,7 @@ async def fetch_pollution_by_coords(
 
 
 async def pollution_to_dataframe(
-        pollution_data_list: List[Dict[Any, Any]], city_id: int
+    pollution_data_list: List[Dict[Any, Any]], city_id: int
 ) -> List[Pollution]:
     """
     Process dictionaries with pollution data using dataframe
@@ -77,7 +77,7 @@ async def pollution_to_dataframe(
 
 
 def aggregated_pollutions(
-        pollution_data_list: List[Pollution], city_id: int, aggregate: Optional[str] = None
+    pollution_data_list: List[Pollution], city_id: int, aggregate: Optional[str] = None
 ) -> List[Pollution]:
     """
     :param pollution_data_list: List with dictionaries with fetched pollution data from external service

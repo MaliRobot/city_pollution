@@ -23,12 +23,12 @@ class PollutionRepository(IPollutionRepository):
         return self.db.query(Pollution).get(pollution_id)
 
     def get_pollution(
-            self,
-            start: date,
-            end: date,
-            city_id: int,
-            limit: Optional[int] = None,
-            offset: Optional[int] = None,
+        self,
+        start: date,
+        end: date,
+        city_id: int,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
     ) -> List[Pollution]:
         query = self.db.query(Pollution).filter(
             Pollution.city_id == city_id,
@@ -45,7 +45,7 @@ class PollutionRepository(IPollutionRepository):
         return query.all()
 
     def update_pollution(
-            self, pollution_id: int, pollution_data: Dict[Any, Any]
+        self, pollution_id: int, pollution_data: Dict[Any, Any]
     ) -> Optional[Pollution]:
         pollution = self.get_pollution_by_id(pollution_id)
         if pollution:
