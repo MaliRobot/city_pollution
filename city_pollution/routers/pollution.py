@@ -66,7 +66,7 @@ async def get_pollution_data(
 
 
 async def pollution_response_handler(
-    pollution: List[Pollution], city: City, gaps: bool = None
+    pollution: List[Pollution], city: City, gaps: bool = False
 ) -> PollutionItemList:
     """
     Prepare response for pollution data request

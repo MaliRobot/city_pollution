@@ -36,7 +36,9 @@ def city_from_raw_data(raw_data: Dict[Any, Any]) -> City | None:
     return None
 
 
-async def extract_cities_from_raw_data(cities_raw_data: Dict[Any, Any]) -> List[City]:
+async def extract_cities_from_raw_data(
+    cities_raw_data: Dict[Any, Any]
+) -> List[City | None]:
     return [
         city_from_raw_data(loc)
         for loc in cities_raw_data
