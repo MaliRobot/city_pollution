@@ -32,7 +32,7 @@ jobs:
           poetry add --dev pytest
           poetry run pytest
 
-      - name: Linting
+      - name: Static checking
         run: |
           poetry run mypy city_pollution --config-file pyproject.toml
 

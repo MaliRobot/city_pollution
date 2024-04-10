@@ -9,11 +9,11 @@ from city_pollution.services.openweather_service import get_pollution_data
 
 
 async def fetch_pollution_by_coords(
-    lat: float,
-    lon: float,
-    start: int,
-    end: int,
-    city_id: int,
+        lat: float,
+        lon: float,
+        start: int,
+        end: int,
+        city_id: int,
 ) -> List[Pollution] | None:
     """
     Get pollution data for a given city, coordinates and time range
@@ -36,7 +36,7 @@ async def fetch_pollution_by_coords(
 
 
 async def pollution_to_dataframe(
-    pollution_data_list: List[Dict[Any, Any]], city_id: int
+        pollution_data_list: List[Dict[Any, Any]], city_id: int
 ) -> List[Pollution]:
     """
     Process dictionaries with pollution data using dataframe
@@ -54,6 +54,11 @@ async def pollution_to_dataframe(
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
     # convert timestamp to new date column
     df["date"] = df["timestamp"].dt.date
+
+    # check gaps
+    if check_date_gaps(df):
+        raise ValueError("Date gaps")
+
     # get float columns
     float_columns = df.select_dtypes(include=["float"]).columns
     # fill the missing values with mean values
@@ -72,7 +77,7 @@ async def pollution_to_dataframe(
 
 
 def aggregated_pollutions(
-    pollution_data_list: List[Pollution], city_id: int, aggregate: Optional[str] = None
+        pollution_data_list: List[Pollution], city_id: int, aggregate: Optional[str] = None
 ) -> List[Pollution]:
     """
     :param pollution_data_list: List with dictionaries with fetched pollution data from external service
@@ -87,6 +92,11 @@ def aggregated_pollutions(
     df = pd.DataFrame(pollution_data_list)
     # convert date to datetime
     df["date"] = pd.to_datetime(df["date"])
+
+    # check gaps
+    if check_date_gaps(df):
+        raise ValueError("Date gaps")
+
     # get all float columns
     float_columns = df.select_dtypes(include="float").columns
 
@@ -109,6 +119,21 @@ def aggregated_pollutions(
     return pandas_to_dataclasses(aggregated_df, city_id)
 
 
+def check_date_gaps(df: pd.DataFrame):
+    """
+    Check if date gaps exist in Pollution data
+    :param df: DataFrame with pollution data
+    :type df: DataFrame
+    :return: true if date gaps exist in Pollution, else false
+    :rtype: bool
+    """
+    df_copy = df.copy()
+    df_copy["gaps"] = df_copy["date"].sort_values().diff() > pd.to_timedelta("1 day")
+    if df_copy["gaps"].count() > 0:
+        return True
+    return False
+
+
 def pandas_to_dataclasses(df: pd.DataFrame, city_id: int) -> List[Pollution]:
     """
     Exports dataframe rows to Pollution class instances
@@ -119,7 +144,6 @@ def pandas_to_dataclasses(df: pd.DataFrame, city_id: int) -> List[Pollution]:
     :rtype: List[Pollution]
     """
     pollutions = []
-    print(df.head(5))
     for index, row in df.iterrows():
         pollution = Pollution(
             co=row["co"],
