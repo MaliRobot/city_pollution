@@ -50,12 +50,15 @@ async def get_pollution_data(
         pollution_repo = PollutionRepository(db)
         if aggregate != Aggregate.DAILY:
             pollutions = pollution_repo.get_pollution(dates.start, dates.end, city.id)
-            agg_pollution = aggregated_pollutions(pollutions, city.id, aggregate.value)
+            agg_pollution, gaps = aggregated_pollutions(
+                pollutions, city.id, aggregate.value
+            )
             return PollutionItemList(
                 data=[PollutionItem.model_validate(x) for x in agg_pollution],
                 city=CitySchema.model_validate(city),
                 start=dates.start,
                 end=dates.end,
+                gaps=gaps,
             )
 
         pollution = pollution_repo.get_pollution(

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Any, Dict
 
 from sqlalchemy import and_
 
@@ -41,18 +41,20 @@ class PollutionRepository(IPollutionRepository):
             query = query.offset(offset)
         if limit:
             query = query.limit(limit)
+        query = query.order_by(Pollution.date)
         return query.all()
 
     def update_pollution(
-        self, pollution_id: int, pollution_data: Dict[Any, Any]
-    ) -> Optional[Pollution]:
+        self, pollution_id: int, pollution_data: Dict[str, Any]
+    ) -> Pollution | None:
         pollution = self.get_pollution_by_id(pollution_id)
         if pollution:
-            for key, value in pollution_data:
+            for key, value in pollution_data.items():
                 setattr(pollution, key, value)
             self.db.commit()
             self.db.refresh(pollution)
-        return pollution
+            return pollution
+        return None
 
     def delete_pollution_range(self, start: date, end: date, city_id: int) -> int:
         result = (

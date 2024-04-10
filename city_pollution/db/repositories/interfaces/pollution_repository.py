@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Any, Dict
 
 from city_pollution.entities.pollution import Pollution
 
@@ -27,7 +27,7 @@ class IPollutionRepository(ABC):
 
     @abstractmethod
     def update_pollution(
-        self, pollution_id: int, pollution_data: Dict[Any, Any]
+        self, pollution_id: int, pollution_data: Dict[str, Any]
     ) -> Optional[Pollution]:
         raise NotImplementedError
 

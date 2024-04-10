@@ -24,6 +24,7 @@ pydantic-extra-types = "^2.6.0"
 opencage = "^2.4.0"
 pytest-mock = "^3.14.0"
 pytest-asyncio = "^0.23.6"
+sqlalchemy-stubs = "^0.4"
 
 [tool.black]
 line-length = 88
@@ -49,15 +50,15 @@ strict_equality = true
 disallow_untyped_decorators = false
 ignore_missing_imports = true
 implicit_reexport = true
-plugins = "pydantic.mypy"
-exclude = [".git", ".mypy_cache", ".ruff_cache", ".venv", "app/alembic/*", "tests", "volumes", "city_pollution/db/*"]
+plugins = ["pydantic.mypy"]
+exclude = [".git", ".mypy_cache", ".ruff_cache", ".venv", "volumes"]
 
 [[tool.mypy.overrides]]
 module = ["tests"]
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = ["city_pollution.db"]
+module = ["city_pollution.db.*"]
 ignore_errors = true
 
 [tool.pydantic-mypy]

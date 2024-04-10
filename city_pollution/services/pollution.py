@@ -1,4 +1,5 @@
-from typing import List, Dict, Any, Optional
+import logging
+from typing import List, Dict, Any, Optional, Tuple
 
 import pandas as pd
 from pandas import DataFrame
@@ -54,6 +55,16 @@ async def pollution_to_dataframe(
     df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
     # convert timestamp to new date column
     df["date"] = df["timestamp"].dt.date
+
+    # check gaps
+    gaps = check_date_gaps(df)
+    if gaps:
+        start = df.head(1)["date"]
+        end = df.tail(1)["date"]
+        logging.info(
+            f"Gaps in import data in range {start} to {end} for city_id {city_id}"
+        )
+
     # get float columns
     float_columns = df.select_dtypes(include=["float"]).columns
     # fill the missing values with mean values
@@ -73,7 +84,7 @@ async def pollution_to_dataframe(
 
 def aggregated_pollutions(
     pollution_data_list: List[Pollution], city_id: int, aggregate: Optional[str] = None
-) -> List[Pollution]:
+) -> Tuple[List[Pollution], bool]:
     """
     :param pollution_data_list: List with dictionaries with fetched pollution data from external service
     :type pollution_data_list: List[Dict]
@@ -87,6 +98,10 @@ def aggregated_pollutions(
     df = pd.DataFrame(pollution_data_list)
     # convert date to datetime
     df["date"] = pd.to_datetime(df["date"])
+
+    # check gaps
+    gaps = check_date_gaps(df)
+
     # get all float columns
     float_columns = df.select_dtypes(include="float").columns
 
@@ -106,7 +121,22 @@ def aggregated_pollutions(
     # drop intermediate freq column
     aggregated_df.drop(columns=[freq], inplace=True)
 
-    return pandas_to_dataclasses(aggregated_df, city_id)
+    return pandas_to_dataclasses(aggregated_df, city_id), gaps
+
+
+def check_date_gaps(df: pd.DataFrame) -> bool:
+    """
+    Check if date gaps exist in Pollution data
+    :param df: DataFrame with pollution data
+    :type df: DataFrame
+    :return: true if date gaps exist in Pollution, else false
+    :rtype: bool
+    """
+    df_copy = df.copy()
+    df_copy["gaps"] = df_copy["date"].sort_values().diff() > pd.to_timedelta("1 day")
+    if df_copy["gaps"].sum() > 0:
+        return True
+    return False
 
 
 def pandas_to_dataclasses(df: pd.DataFrame, city_id: int) -> List[Pollution]:
@@ -119,7 +149,6 @@ def pandas_to_dataclasses(df: pd.DataFrame, city_id: int) -> List[Pollution]:
     :rtype: List[Pollution]
     """
     pollutions = []
-    print(df.head(5))
     for index, row in df.iterrows():
         pollution = Pollution(
             co=row["co"],
