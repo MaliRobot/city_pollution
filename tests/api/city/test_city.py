@@ -23,7 +23,6 @@ def test_get_city_coords_by_name(
     valid_name = "New York"
     response = client.get("api/city/name/", params={"name": valid_name})
     assert response.status_code == 200
-    data = response.json()
 
     response = client.get("api/city/name/", params={"name": ""})
     assert response.status_code == 422

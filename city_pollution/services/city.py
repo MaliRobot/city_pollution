@@ -1,12 +1,15 @@
-from typing import Dict
+from typing import Dict, Any
 
 from city_pollution.entities import City
-from city_pollution.services.geocoder_service import get_reverse_geocode, get_city_by_name
+from city_pollution.services.geocoder_service import (
+    get_reverse_geocode,
+    get_city_by_name,
+)
 
 TOLERANCE = 0.5
 
 
-def city_from_raw_data(raw_data: Dict) -> City | None:
+def city_from_raw_data(raw_data: Dict[Any, Any]) -> City | None:
     """
     Instantiate City object from raw_data dictionary
     :param raw_data: Dictionary containing raw city data
@@ -57,9 +60,9 @@ async def get_city(lat: float, lon: float, city_name: str) -> City | None:
 
         for city in cities:
             if (
-                    city is not None
-                    and abs(city.lat - lat) < TOLERANCE
-                    and abs(city.lon - lon) < TOLERANCE
+                city is not None
+                and abs(city.lat - lat) < TOLERANCE
+                and abs(city.lon - lon) < TOLERANCE
             ):
                 return city
     return None

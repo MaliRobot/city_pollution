@@ -14,9 +14,19 @@ class Dates(BaseModel):
     end: date = Field(..., description="End time as date")
 
     @model_validator(mode="before")
-    def validate_dates(cls, values):
+    def validate_dates(cls, values: dict[str, date]) -> dict[str, date]:
+        """
+        Validate dates
+        :param values:
+        :return:
+        """
         start_date = values.get("start")
         end_date = values.get("end")
+        if start_date is None or end_date is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Start and end dates are both required.",
+            )
         current_date = datetime.now().date()
 
         try:
@@ -76,5 +86,6 @@ class PollutionItemList(BaseModel):
 
 
 class Aggregate(Enum):
+    DAILY = "daily"
     MONTHLY = "monthly"
     YEARLY = "yearly"

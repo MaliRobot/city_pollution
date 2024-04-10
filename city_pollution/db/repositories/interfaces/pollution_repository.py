@@ -16,18 +16,18 @@ class IPollutionRepository(ABC):
 
     @abstractmethod
     def get_pollution(
-            self,
-            start: date,
-            end: date,
-            city_id: int,
-            limit: int = None,
-            offset: int = None,
+        self,
+        start: date,
+        end: date,
+        city_id: int,
+        limit: Optional[int],
+        offset: Optional[int],
     ) -> List[Pollution]:
         raise NotImplementedError
 
     @abstractmethod
     def update_pollution(
-            self, pollution_id: int, pollution_data: Dict[Any, Any]
+        self, pollution_id: int, pollution_data: Dict[Any, Any]
     ) -> Optional[Pollution]:
         raise NotImplementedError
 

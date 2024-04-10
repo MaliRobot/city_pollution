@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Any, Optional
 
 import pandas as pd
 from pandas import DataFrame
@@ -9,11 +9,11 @@ from city_pollution.services.openweather_service import get_pollution_data
 
 
 async def fetch_pollution_by_coords(
-        lat: float,
-        lon: float,
-        start: int,
-        end: int,
-        city_id: int,
+    lat: float,
+    lon: float,
+    start: int,
+    end: int,
+    city_id: int,
 ) -> List[Pollution] | None:
     """
     Get pollution data for a given city, coordinates and time range
@@ -36,7 +36,7 @@ async def fetch_pollution_by_coords(
 
 
 async def pollution_to_dataframe(
-        pollution_data_list: List[Dict], city_id: int
+    pollution_data_list: List[Dict[Any, Any]], city_id: int
 ) -> List[Pollution]:
     """
     Process dictionaries with pollution data using dataframe
@@ -72,13 +72,15 @@ async def pollution_to_dataframe(
 
 
 def aggregated_pollutions(
-        pollution_data_list: List[Pollution], city_id: int, aggregate: str = None
+    pollution_data_list: List[Pollution], city_id: int, aggregate: Optional[str] = None
 ) -> List[Pollution]:
     """
     :param pollution_data_list: List with dictionaries with fetched pollution data from external service
     :type pollution_data_list: List[Dict]
     :param city_id: ID of the city we are interested in
     :type city_id: int
+    :param aggregate: Value by which to aggregate the data
+    :type aggregate: str, optional
     :return: Pollution data
     :rtype: List[Pollution]
     """
@@ -117,6 +119,7 @@ def pandas_to_dataclasses(df: pd.DataFrame, city_id: int) -> List[Pollution]:
     :rtype: List[Pollution]
     """
     pollutions = []
+    print(df.head(5))
     for index, row in df.iterrows():
         pollution = Pollution(
             co=row["co"],

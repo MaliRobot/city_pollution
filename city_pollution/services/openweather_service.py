@@ -7,7 +7,7 @@ from city_pollution.config.settings import settings
 
 
 async def get_pollution_data(
-        lat: float, lon: float, start: int, end: int
+    lat: float, lon: float, start: int, end: int
 ) -> List[Dict[str, Any]]:
     """
     Retrieve data from OpenWeatherMap and process it to get pollution data

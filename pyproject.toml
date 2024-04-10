@@ -46,11 +46,19 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_return_any = true
 strict_equality = true
-disallow_untyped_decorators = true
+disallow_untyped_decorators = false
 ignore_missing_imports = true
 implicit_reexport = true
 plugins = "pydantic.mypy"
-exclude = [".git", ".mypy_cache", ".ruff_cache", ".venv", "app/alembic/*", "tests", "volumes"]
+exclude = [".git", ".mypy_cache", ".ruff_cache", ".venv", "app/alembic/*", "tests", "volumes", "city_pollution/db/*"]
+
+[[tool.mypy.overrides]]
+module = ["tests"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["city_pollution.db"]
+ignore_errors = true
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

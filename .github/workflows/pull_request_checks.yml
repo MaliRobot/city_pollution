@@ -32,8 +32,11 @@ jobs:
           poetry add --dev pytest
           poetry run pytest
 
-      - name: Check code style
+      - name: Linting
         run: |
-          # Add commands to check code style (e.g., linting) here
-          # For example:
-          # flake8
+          poetry run mypy city_pollution --config-file pyproject.toml
+
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "./city_pollution"

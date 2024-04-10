@@ -2,7 +2,9 @@ import random
 from datetime import date
 from typing import ClassVar, List, Optional, Dict, Any
 
-from city_pollution.db.repositories.interfaces.pollution_repository import IPollutionRepository
+from city_pollution.db.repositories.interfaces.pollution_repository import (
+    IPollutionRepository,
+)
 from city_pollution.entities import Pollution
 
 
@@ -33,7 +35,7 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
         self.pollutions = [
             Pollution(
                 id=1,
-                co=100,
+                co=100.0,
                 no=0.0,
                 no2=11.0,
                 o3=25.0,
@@ -46,7 +48,7 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
             ),
             Pollution(
                 id=2,
-                co=100,
+                co=100.0,
                 no=0.0,
                 no2=12.0,
                 o3=23.0,
@@ -59,7 +61,7 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
             ),
             Pollution(
                 id=3,
-                co=34,
+                co=34.0,
                 no=10.0,
                 no2=45.0,
                 o3=23.0,
@@ -73,12 +75,12 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
         ]
 
     def get_pollution(
-            self,
-            start: date,
-            end: date,
-            city_id: int,
-            limit: int = None,
-            offset: int = None,
+        self,
+        start: date,
+        end: date,
+        city_id: int,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
     ) -> List[Pollution]:
         result = [
             x
@@ -102,7 +104,7 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
         begin_len = len(self.pollutions)
         for pollution in self.pollutions:
             if (
-                    pollution.date < start or pollution.date > end
+                pollution.date < start or pollution.date > end
             ) or city_id != pollution.city_id:
                 temp.append(pollution)
         self.pollutions = temp
@@ -113,7 +115,7 @@ class PollutionRepositoryPrepopulated((IPollutionRepository)):
         return self.db.query(Pollution).get(pollution_id)
 
     def update_pollution(
-            self, pollution_id: int, pollution_data: Dict[Any, Any]
+        self, pollution_id: int, pollution_data: Dict[Any, Any]
     ) -> Optional[Pollution]:
         for pollution in self.pollutions:
             if pollution.id == pollution_data.get(pollution.id):

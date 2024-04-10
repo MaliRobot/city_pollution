@@ -4,7 +4,9 @@ from typing import List, Optional, Dict, Any
 
 from sqlalchemy import and_
 
-from city_pollution.db.repositories.interfaces.pollution_repository import IPollutionRepository
+from city_pollution.db.repositories.interfaces.pollution_repository import (
+    IPollutionRepository,
+)
 from city_pollution.dependencies import Session
 from city_pollution.entities.pollution import Pollution
 
@@ -21,12 +23,12 @@ class PollutionRepository(IPollutionRepository):
         return self.db.query(Pollution).get(pollution_id)
 
     def get_pollution(
-            self,
-            start: date,
-            end: date,
-            city_id: int,
-            limit: int = None,
-            offset: int = None,
+        self,
+        start: date,
+        end: date,
+        city_id: int,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
     ) -> List[Pollution]:
         query = self.db.query(Pollution).filter(
             Pollution.city_id == city_id,
@@ -42,7 +44,7 @@ class PollutionRepository(IPollutionRepository):
         return query.all()
 
     def update_pollution(
-            self, pollution_id: int, pollution_data: Dict[Any, Any]
+        self, pollution_id: int, pollution_data: Dict[Any, Any]
     ) -> Optional[Pollution]:
         pollution = self.get_pollution_by_id(pollution_id)
         if pollution:
@@ -62,4 +64,4 @@ class PollutionRepository(IPollutionRepository):
         ).delete()
 
         self.db.commit()
-        return result if result is not None else 0
+        return result

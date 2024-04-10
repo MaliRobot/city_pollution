@@ -15,7 +15,10 @@ from city_pollution.schemas.pollution import (
     Aggregate,
 )
 from city_pollution.services.city import get_city
-from city_pollution.services.pollution import fetch_pollution_by_coords, aggregated_pollutions
+from city_pollution.services.pollution import (
+    fetch_pollution_by_coords,
+    aggregated_pollutions,
+)
 
 router = APIRouter(
     prefix="/api/pollution",
@@ -29,28 +32,30 @@ router = APIRouter(
     summary="Get pollution data by coordinates",
     response_model=PollutionItemList,
     description="Get pollution data by coordinates provided that coordinates match any city or town."
-                "Loads only data from the database, ie, what is imported so far from external services."
-                "Has limit and offset parameters for possibility of pagination for front end",
+    "Loads only data from the database, ie, what is imported so far from external services."
+    "Has limit and offset parameters for possibility of pagination for front end",
 )
 async def get_pollution_data(
-        aggregate: Aggregate = None,
-        city_id: int = Query(..., description="Id of city to get pollution data for"),
-        dates: Dates = Depends(),
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-        db: Session = Depends(get_db),
+    aggregate: Aggregate = Aggregate.DAILY,
+    city_id: int = Query(..., description="Id of city to get pollution data for"),
+    dates: Dates = Depends(),
+    limit: Optional[int] = None,
+    offset: Optional[int] = None,
+    db: Session = Depends(get_db),
 ) -> PollutionItemList:
     city_repo = CityRepository(db)
     city = city_repo.get_city_by_id(city_id)
 
-    if city is not None:
+    if city and city.id:
         pollution_repo = PollutionRepository(db)
-        if aggregate:
+        if aggregate != Aggregate.DAILY:
             pollutions = pollution_repo.get_pollution(dates.start, dates.end, city.id)
-            agg_pollution = aggregated_pollutions(pollutions, city.id, aggregate)
+            agg_pollution = aggregated_pollutions(pollutions, city.id, aggregate.value)
             return PollutionItemList(
                 data=[PollutionItem.model_validate(x) for x in agg_pollution],
                 city=CitySchema.model_validate(city),
+                start=dates.start,
+                end=dates.end,
             )
 
         pollution = pollution_repo.get_pollution(
@@ -75,12 +80,12 @@ async def get_pollution_data(
     operation_id="import_pollution_data_for_location",
     summary="Import pollution data",
     description="Import pollution for given location. Location must match city or town"
-                "that is fetched from external service if it's not already in database"
-                "Then pollution data is fetched from external service. Old pollution data is deleted if"
-                "exists for a given city/town.",
+    "that is fetched from external service if it's not already in database"
+    "Then pollution data is fetched from external service. Old pollution data is deleted if"
+    "exists for a given city/town.",
 )
 async def import_historical_pollution_by_coords(
-        pollution_params: PollutionSchema, db: Session = Depends(get_db)
+    pollution_params: PollutionSchema, db: Session = Depends(get_db)
 ) -> Dict[str, str]:
     city_repo = CityRepository(db)
     city = city_repo.search_city(
@@ -94,7 +99,7 @@ async def import_historical_pollution_by_coords(
         if city_data:
             city = city_repo.create_city(city_data)
 
-    if city:
+    if city and city.id:
         start_ts = int(
             datetime.combine(
                 pollution_params.dates.start, datetime.min.time()
@@ -135,15 +140,15 @@ async def import_historical_pollution_by_coords(
     description="Delete pollution data for given city and coordinates.",
 )
 async def delete_pollution_data(
-        lat: float = Query(..., description="Latitude", ge=-90, le=90),
-        lon: float = Query(..., description="Longitude", ge=-180, le=180),
-        dates: Dates = Depends(),
-        db: Session = Depends(get_db),
-) -> Dict[str, Union[bool, int | None]]:
+    lat: float = Query(..., description="Latitude", ge=-90, le=90),
+    lon: float = Query(..., description="Longitude", ge=-180, le=180),
+    dates: Dates = Depends(),
+    db: Session = Depends(get_db),
+) -> Dict[str, Union[bool, int]]:
     city_repo = CityRepository(db)
     city = city_repo.get_city_by_lat_and_lon(lat, lon)
-    if city is None:
-        raise HTTPException(status_code=404, detail="City not found")
-    pollution_repo = PollutionRepository(db)
-    result = pollution_repo.delete_pollution_range(dates.start, dates.end, city.id)
-    return {"success": True, "deleted": result}
+    if city and city.id:
+        pollution_repo = PollutionRepository(db)
+        result = pollution_repo.delete_pollution_range(dates.start, dates.end, city.id)
+        return {"success": True, "deleted": result}
+    raise HTTPException(status_code=404, detail="City not found")
