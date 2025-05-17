@@ -24,9 +24,10 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 WORKDIR $PYSETUP_PATH
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install --no-dev
+RUN poetry install --only main
+RUN poetry add opencage
 
-COPY .env /app/.env
+COPY .env /src/.env
 
 FROM python-base as development
 ENV FASTAPI_ENV=development
@@ -36,17 +37,21 @@ COPY --from=builder-base $POETRY_HOME $POETRY_HOME
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 RUN poetry install
+RUN poetry add opencage
 
-WORKDIR /app
+WORKDIR /src
 
 COPY . .
-ENTRYPOINT [ "/app/entrypoint.sh" ]
+
+EXPOSE 8000
+
+ENTRYPOINT [ "/src/entrypoint.sh" ]
 
 
 FROM python-base as production
 ENV FASTAPI_ENV=production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-COPY ./app /app/
-WORKDIR /app
+COPY ./src /src/
+WORKDIR /src
 RUN pip install gunicorn
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "app.main:app"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "src.main:app"]

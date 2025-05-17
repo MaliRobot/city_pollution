@@ -7,7 +7,7 @@ from tests.repositories.pollution import PollutionRepositoryPrepopulated
 @pytest.fixture
 def mock_city_repository(mocker):
     mocker.patch(
-        "app.routers.pollution.CityRepository",
+        "src.routers.pollution.CityRepository",
         CityRepositoryPrepopulated,
     )
 
@@ -15,6 +15,6 @@ def mock_city_repository(mocker):
 @pytest.fixture
 def mock_pollution_repository(mocker):
     mocker.patch(
-        "app.routers.pollution.PollutionRepository",
+        "src.routers.pollution.PollutionRepository",
         PollutionRepositoryPrepopulated,
     )

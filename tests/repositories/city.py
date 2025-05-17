@@ -2,8 +2,8 @@ import random
 from datetime import datetime
 from typing import ClassVar, Dict, Any, List
 
-from app.db.repositories.interfaces.city_repository import ICityRepository
-from app.entities import City
+from src.db.repositories.interfaces.city_repository import ICityRepository
+from entities import City
 
 
 class CityFactory:

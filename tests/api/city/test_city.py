@@ -1,6 +1,6 @@
 from pytest_mock import MockerFixture
 
-from app.entities.city import City
+from entities.city import City
 
 from tests.config import client
 from tests.repositories.city import CityRepositoryPrepopulated

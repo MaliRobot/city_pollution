@@ -2,8 +2,8 @@ from datetime import date
 
 import pytest
 
-from app.entities.pollution import Pollution
-from app.services.pollution import pollution_to_dataframe
+from entities.pollution import Pollution
+from services.pollution import pollution_to_dataframe
 
 
 @pytest.mark.asyncio

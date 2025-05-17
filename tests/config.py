@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.dependencies import get_db
-from app.main import app
+from src.dependencies import get_db
+from src.main import app
 
 
 class FakeDB:
