@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, time
 from typing import List, Optional, Any, Dict
 
 from sqlalchemy import and_
@@ -37,11 +37,12 @@ class PollutionRepository(IPollutionRepository):
                 Pollution.date <= end,
             ),
         )
+        query = query.order_by(Pollution.date)
         if offset:
             query = query.offset(offset)
         if limit:
             query = query.limit(limit)
-        query = query.order_by(Pollution.date)
+
         return query.all()
 
     def update_pollution(

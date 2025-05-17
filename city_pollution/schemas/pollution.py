@@ -84,6 +84,7 @@ class PollutionItemList(BaseModel):
     start: Optional[date]
     end: Optional[date]
     gaps: Optional[bool] = None
+    plot_url: Optional[str] = None
 
 
 class Aggregate(Enum):

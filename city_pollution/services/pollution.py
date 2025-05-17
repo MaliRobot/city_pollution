@@ -95,6 +95,9 @@ def aggregated_pollutions(
     :return: Pollution data
     :rtype: List[Pollution]
     """
+    if not pollution_data_list:
+        return [], False
+
     df = pd.DataFrame(pollution_data_list)
     # convert date to datetime
     df["date"] = pd.to_datetime(df["date"])
