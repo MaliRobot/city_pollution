@@ -1,11 +1,35 @@
 from typing import Dict
+import os
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from city_pollution.routers import pollution, city
+from city_pollution.config.settings import settings
+
+
+# Create plots directory if it doesn't exist
+PLOTS_DIR = "/tmp/outputs/plots"
+os.makedirs(PLOTS_DIR, exist_ok=True)
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+PLOTS_DIR = settings.temp_dir
+PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+
+# Mount the plots directory
+app.mount(settings.plots_url_base, StaticFiles(directory=PLOTS_DIR), name="plots")
 
 app.include_router(pollution.router)
 app.include_router(city.router)

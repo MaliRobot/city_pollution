@@ -1,10 +1,16 @@
 import logging
+import os
+import uuid
+from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
 import pandas as pd
+from matplotlib import pyplot as plt
 from pandas import DataFrame
 
+from city_pollution.config.settings import settings
 from city_pollution.entities import Pollution
+from city_pollution.schemas.city import City
 from city_pollution.schemas.pollution import Aggregate
 from city_pollution.services.openweather_service import get_pollution_data
 
@@ -167,3 +173,88 @@ def pandas_to_dataclasses(df: pd.DataFrame, city_id: int) -> List[Pollution]:
         )
         pollutions.append(pollution)
     return pollutions
+
+
+def generate_pollution_plot(
+    pollution_data: List[Pollution], city: City
+) -> Optional[str]:
+    """
+    Generate a plot for pollution data and return the file path
+
+    :param pollution_data: List of Pollution instances
+    :param city: City instance
+    :return: URL to the generated plot or None if no data
+    """
+    if not pollution_data:
+        return None
+
+    # Extract dates and pollutant values
+    dates = [p.date for p in pollution_data]
+    pollutants = {
+        "CO": [p.co for p in pollution_data],
+        "NO": [p.no for p in pollution_data],
+        "NO2": [p.no2 for p in pollution_data],
+        "O3": [p.o3 for p in pollution_data],
+        "SO2": [p.so2 for p in pollution_data],
+        "PM2.5": [p.pm2_5 for p in pollution_data],
+        "PM10": [p.pm10 for p in pollution_data],
+        "NH3": [p.nh3 for p in pollution_data],
+    }
+
+    # Create a figure with multiple subplots for each pollutant
+    fig, axes = plt.subplots(4, 2, figsize=(14, 16))
+    fig.suptitle(
+        f"Pollution Data for {city.name} ({dates[0]} to {dates[-1]})", fontsize=16
+    )
+
+    # Plot each pollutant on its own subplot
+    for i, (pollutant, values) in enumerate(pollutants.items()):
+        row, col = divmod(i, 2)
+        ax = axes[row, col]
+
+        # Filter out None values
+        valid_data = [(d, v) for d, v in zip(dates, values) if v is not None]
+        if valid_data:
+            plot_dates, plot_values = zip(*valid_data)
+            ax.plot(plot_dates, plot_values, marker="o", linestyle="-", markersize=4)
+            ax.set_title(pollutant)
+            ax.set_ylabel("Concentration")
+            ax.grid(True)
+
+            # Set x-axis labels to be readable
+            if len(plot_dates) > 10:
+                # Show fewer x-ticks if there are many dates
+                step = max(1, len(plot_dates) // 10)
+                ax.set_xticks(plot_dates[::step])
+
+            ax.tick_params(axis="x", rotation=45)
+        else:
+            ax.text(
+                0.5,
+                0.5,
+                f"No data for {pollutant}",
+                horizontalalignment="center",
+                verticalalignment="center",
+                transform=ax.transAxes,
+            )
+
+    # Adjust layout
+    plt.tight_layout(rect=[0, 0, 1, 0.96])  # Leave space for suptitle
+
+    # Create a directory for storing plots if it doesn't exist yet
+    plots_dir: Path = Path(settings.temp_dir)
+    plots_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate a unique filename
+    safe_city_name = city.name.replace(" ", "_")
+    plot_filename = (
+        f"{safe_city_name}_{dates[0]}_{dates[-1]}_{uuid.uuid4().hex[:8]}.png"
+    )
+    plot_path = plots_dir / plot_filename
+
+    # Save the plot
+    plt.savefig(plot_path)
+    plt.close(fig)
+
+    # Return the URL for accessing the plot
+    return f"{settings.plots_url_base}/{plot_filename}"

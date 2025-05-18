@@ -10,9 +10,7 @@ from datetime import date, timedelta
 import random
 import matplotlib.pyplot as plt
 
-# Create plots directory
-PLOTS_DIR = "/tmp/outputs/plots"
-os.makedirs(PLOTS_DIR, exist_ok=True)
+from city_pollution.config.settings import settings
 
 
 # Mock pollution data
@@ -138,7 +136,7 @@ def generate_pollution_plot(pollution_data, city):
 
     # Generate a unique filename
     plot_filename = f"{city.name.replace(' ', '_')}_{dates[0]}_{dates[-1]}_{uuid.uuid4().hex[:8]}.png"
-    plot_path = os.path.join(PLOTS_DIR, plot_filename)
+    plot_path = os.path.join(settings.temp_dir, plot_filename)
 
     # Save the plot
     plt.savefig(plot_path)
@@ -150,18 +148,32 @@ def generate_pollution_plot(pollution_data, city):
     return f"/api/plots/{plot_filename}"
 
 
-# Create test data for different cities
-cities = [
-    MockCity(id=1, name="London", lat=51.5074, lon=-0.1278),
-    MockCity(id=2, name="New York", lat=40.7128, lon=-74.0060),
-    MockCity(id=3, name="Singapore", lat=1.3521, lon=103.8198),
-]
+def test_plot_generation():
+    """
+    Test the plot generation function with mock data
+    """
+    # Create test data for different cities
+    cities = [
+        MockCity(id=1, name="London", lat=51.5074, lon=-0.1278),
+        MockCity(id=2, name="New York", lat=40.7128, lon=-74.0060),
+        MockCity(id=3, name="Singapore", lat=1.3521, lon=103.8198),
+    ]
 
-# Generate and plot data for each city
-for city in cities:
-    start_date = date(2023, 1, 1)
-    pollution_data = generate_mock_pollution_data(city.id, start_date, days=30)
-    plot_url = generate_pollution_plot(pollution_data, city)
-    print(f"City: {city.name}, Plot URL: {plot_url}")
+    # Generate and plot data for each city
+    for city in cities:
+        start_date = date(2023, 1, 1)
+        pollution_data = generate_mock_pollution_data(city.id, start_date, days=30)
+        plot_url = generate_pollution_plot(pollution_data, city)
+        print(f"City: {city.name}, Plot URL: {plot_url}")
 
-print("\nTest complete. Check the plots directory for generated files.")
+        assert plot_url.startswith(
+            "/api/plots/"
+        ), "Returned plot URL should start with /api/plots/"
+
+        plot_filename = plot_url.split("/api/plots/")[1]
+        expected_path = settings.temp_dir / plot_filename
+
+        assert expected_path.exists(), f"Plot file was not created at {expected_path}"
+        assert expected_path.suffix == ".png", "Plot file should have .png extension"
+
+    print("\nTest complete. Check the plots directory for generated files.")

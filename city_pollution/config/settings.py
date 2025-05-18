@@ -1,3 +1,6 @@
+from pathlib import Path
+from tempfile import gettempdir
+
 from pydantic_settings import BaseSettings
 
 
@@ -13,6 +16,8 @@ class Settings(BaseSettings):
     opencage_key: str = ""
     openweather_url: str = ""
     openweather_key: str = ""
+    temp_dir: Path = Path(gettempdir()) / "city_pollution" / "plots"
+    plots_url_base: str = "/api/plots"
 
     class Config:
         env_file = ".env"

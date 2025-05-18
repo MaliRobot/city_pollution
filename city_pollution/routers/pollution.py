@@ -19,6 +19,7 @@ from city_pollution.services.city import get_city
 from city_pollution.services.pollution import (
     fetch_pollution_by_coords,
     aggregated_pollutions,
+    generate_pollution_plot,
 )
 
 router = APIRouter(
@@ -80,15 +81,20 @@ async def pollution_response_handler(
     :rtype: List[PollutionItemList]
     """
     start_dt = end_dt = None
+    plot_url = None
+
     if len(pollution) > 0:
         start_dt = pollution[0].date
         end_dt = pollution[-1].date
+        plot_url = generate_pollution_plot(pollution, city)
+
     return PollutionItemList(
         data=[PollutionItem.model_validate(x) for x in pollution],
         city=CitySchema.model_validate(city),
         start=start_dt,
         end=end_dt,
         gaps=gaps,
+        plot_url=plot_url,
     )
 
 
