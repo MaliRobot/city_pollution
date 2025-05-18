@@ -26,6 +26,8 @@ def test_valid_pollution_params(
     assert len(data["data"]) > 0
     # assert all pollution data is for the given city
     assert set([x["city_id"] for x in data["data"]]) == {data["city"]["id"]}
+    assert data["plot_url"] != None
+    assert data["plot_url"].endswith(".png") is True
 
 
 def test_valid_pollution_params_no_data(
@@ -41,6 +43,7 @@ def test_valid_pollution_params_no_data(
     assert response.status_code == 200
     assert response.json()["city"]["name"] == "San Francisco"
     assert len(response.json()["data"]) == 0
+    assert response.json()["plot_url"] == None
 
 
 def test_get_pollution_invalid_start_timestamp() -> None:
