@@ -1,5 +1,4 @@
 import logging
-import os
 import uuid
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
@@ -9,8 +8,7 @@ from matplotlib import pyplot as plt
 from pandas import DataFrame
 
 from city_pollution.config.settings import settings
-from city_pollution.entities import Pollution
-from city_pollution.schemas.city import City
+from city_pollution.entities import Pollution, City
 from city_pollution.schemas.pollution import Aggregate
 from city_pollution.services.openweather_service import get_pollution_data
 
@@ -239,7 +237,7 @@ def generate_pollution_plot(
             )
 
     # Adjust layout
-    plt.tight_layout(rect=[0, 0, 1, 0.96])  # Leave space for suptitle
+    plt.tight_layout(rect=(0.0, 0.0, 1.0, 0.96))
 
     # Create a directory for storing plots if it doesn't exist yet
     plots_dir: Path = Path(settings.temp_dir)

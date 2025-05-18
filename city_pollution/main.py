@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict
 import os
 
@@ -10,10 +11,6 @@ from city_pollution.routers import pollution, city
 from city_pollution.config.settings import settings
 
 
-# Create plots directory if it doesn't exist
-PLOTS_DIR = "/tmp/outputs/plots"
-os.makedirs(PLOTS_DIR, exist_ok=True)
-
 app = FastAPI()
 
 # Add CORS middleware
@@ -25,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-PLOTS_DIR = settings.temp_dir
+PLOTS_DIR: Path = settings.temp_dir
 PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Mount the plots directory
