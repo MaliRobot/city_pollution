@@ -67,9 +67,11 @@ class CityRepositoryPrepopulated(ICityRepository):
         self.cities.append(city)
         return city
 
-    def get_city_by_lat_and_lon(self, lat, lon) -> City | None:
+    def get_city_by_lat_and_lon(
+        self, lat: float, lon: float, tolerance: float = 0.01
+    ) -> City | None:
         for city in self.cities:
-            if city.lat == lat and city.lon == lon:
+            if abs(city.lat - lat) <= tolerance and abs(city.lon - lon) <= tolerance:
                 return city
         return None
 

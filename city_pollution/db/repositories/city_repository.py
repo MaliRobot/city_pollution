@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional, Dict, Any, List
 
+from sqlalchemy import and_
+
 from city_pollution.db.repositories.interfaces.city_repository import ICityRepository
 from city_pollution.dependencies import Session
 from city_pollution.entities.city import City
@@ -30,8 +32,19 @@ class CityRepository(ICityRepository):
     def get_city_by_id(self, city_id: int) -> Optional[City]:
         return self.db.query(City).get(city_id)
 
-    def get_city_by_lat_and_lon(self, lat: float, lon: float) -> City | None:
-        return self.db.query(City).filter_by(lat=lat, lon=lon).one_or_none()
+    def get_city_by_lat_and_lon(
+        self, lat: float, lon: float, tolerance: float = 0.01
+    ) -> City | None:
+        return (
+            self.db.query(City)
+            .filter(
+                and_(
+                    City.lat.between(lat - tolerance, lat + tolerance),
+                    City.lon.between(lon - tolerance, lon + tolerance),
+                )
+            )
+            .first()
+        )
 
     def update_city(self, city_id: int, city_data: Dict[Any, Any]) -> None:
         self.db.query(City).filter_by(id=city_id).update(**city_data)
