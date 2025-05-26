@@ -55,7 +55,7 @@ class Dates(BaseModel):
         return values
 
 
-class Pollution(BaseModel):
+class PollutionSchema(BaseModel):
     lat: Latitude
     lon: Longitude
     dates: Dates

@@ -11,6 +11,20 @@ from city_pollution.config.settings import settings
 from city_pollution.entities import Pollution, City
 from city_pollution.schemas.pollution import Aggregate
 from city_pollution.services.openweather_service import get_pollution_data
+from datetime import datetime
+from typing import Union
+
+from city_pollution.db.repositories.city_repository import CityRepository
+from city_pollution.db.repositories.pollution_repository import PollutionRepository
+from city_pollution.dependencies import Session
+from city_pollution.schemas.city import City as CitySchema
+from city_pollution.schemas.pollution import (
+    PollutionSchema,
+    PollutionItemList,
+    PollutionItem,
+    Dates,
+)
+from city_pollution.services.city import get_city
 
 
 async def fetch_pollution_by_coords(
@@ -256,3 +270,116 @@ def generate_pollution_plot(
 
     # Return the URL for accessing the plot
     return f"{settings.plots_url_base}/{plot_filename}"
+
+
+async def pollution_response_handler(
+    pollution: List[Pollution], city: City, gaps: bool = False
+) -> PollutionItemList:
+    start_dt = end_dt = None
+    plot_url = None
+
+    if len(pollution) > 0:
+        start_dt = pollution[0].date
+        end_dt = pollution[-1].date
+        plot_url = generate_pollution_plot(pollution, city)
+
+    return PollutionItemList(
+        data=[PollutionItem.model_validate(x) for x in pollution],
+        city=CitySchema.model_validate(city),
+        start=start_dt,
+        end=end_dt,
+        gaps=gaps,
+        plot_url=plot_url,
+    )
+
+
+async def get_pollution_data_service(
+    aggregate: Aggregate,
+    city_id: int,
+    dates: Dates,
+    db: Session,
+    limit: Optional[int] = None,
+    offset: Optional[int] = None,
+) -> PollutionItemList:
+    city_repo = CityRepository(db)
+    city = city_repo.get_city_by_id(city_id)
+
+    if city and city.id:
+        pollution_repo = PollutionRepository(db)
+        if aggregate != Aggregate.DAILY:
+            pollutions = pollution_repo.get_pollution(dates.start, dates.end, city.id)
+            agg_pollution, gaps = aggregated_pollutions(
+                pollutions, city.id, aggregate.value
+            )
+            result = await pollution_response_handler(agg_pollution, city, gaps)
+            return result
+
+        pollution = pollution_repo.get_pollution(
+            dates.start, dates.end, city.id, limit, offset
+        )
+        result = await pollution_response_handler(pollution, city)
+        return result
+    raise ValueError("City not found")
+
+
+async def import_historical_pollution(
+    pollution_params: PollutionSchema, db: Session
+) -> Dict[str, str]:
+    city_repo = CityRepository(db)
+    city = city_repo.search_city(
+        pollution_params.name, pollution_params.lat, pollution_params.lon
+    )
+
+    if city is None:
+        city_data = await get_city(
+            pollution_params.lat, pollution_params.lon, pollution_params.name
+        )
+        if city_data:
+            city = city_repo.create_city(city_data)
+
+    if city and city.id:
+        start_ts = int(
+            datetime.combine(
+                pollution_params.dates.start, datetime.min.time()
+            ).timestamp()
+        )
+        end_ts = int(
+            datetime.combine(
+                pollution_params.dates.end, datetime.min.time()
+            ).timestamp()
+        )
+        pollution_repo = PollutionRepository(db)
+        pollution_repo.delete_pollution_range(
+            pollution_params.dates.start, pollution_params.dates.end, city.id
+        )
+        pollution_data = await fetch_pollution_by_coords(
+            pollution_params.lat,
+            pollution_params.lon,
+            start_ts,
+            end_ts,
+            city.id,
+        )
+
+        if pollution_data:
+            pollution_repo.create_pollution(pollution_data)
+            return {
+                "success": f"pollution data imported for city {city.name} at coords {city.lat} {city.lon}"
+            }
+        else:
+            raise ValueError("Pollution data not found")
+    else:
+        raise ValueError("City not found")
+
+
+async def delete_pollution_data_service(
+    city_id: int,
+    dates: Dates,
+    db: Session,
+) -> Dict[str, Union[bool, int]]:
+    city_repo = CityRepository(db)
+    city = city_repo.get_city_by_id(city_id)
+    if city and city.id:
+        pollution_repo = PollutionRepository(db)
+        result = pollution_repo.delete_pollution_range(dates.start, dates.end, city.id)
+        return {"success": True, "deleted": result}
+    raise ValueError("City not found")
