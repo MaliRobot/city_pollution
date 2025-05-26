@@ -3,6 +3,7 @@
 .venv
 volumes/*
 !volumes/.gitkeep
+temp_files/*
 
 #python
 __pycache__/
