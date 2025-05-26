@@ -94,7 +94,7 @@ def test_import_pollution_data(
         )
 
     mocker.patch(
-        "city_pollution.routers.pollution.get_city",
+        "city_pollution.services.pollution.get_city",
         fake_get_city,
     )
 
@@ -113,7 +113,7 @@ def test_import_pollution_data(
         return pollutions
 
     mocker.patch(
-        "city_pollution.routers.pollution.fetch_pollution_by_coords",
+        "city_pollution.services.pollution.fetch_pollution_by_coords",
         fetch_pollution_by_coords,
     )
 
@@ -158,7 +158,7 @@ def test_import_pollution_data(
         return []
 
     mocker.patch(
-        "city_pollution.routers.pollution.fetch_pollution_by_coords",
+        "city_pollution.services.pollution.fetch_pollution_by_coords",
         fetch_pollution_by_coords,
     )
 
