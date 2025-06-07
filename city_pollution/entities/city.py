@@ -6,7 +6,7 @@ from typing import Optional
 class City:
     id: Optional[int]
     name: str
-    state: str
+    state: Optional[str]
     country: str
     lat: float
     lon: float

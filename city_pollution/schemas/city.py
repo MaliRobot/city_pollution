@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 class City(BaseModel):
     name: str
-    state: str
+    state: Optional[str] = None
     country: str
     lon: float
     lat: float

@@ -2,7 +2,7 @@ from typing import Dict, Union, Optional
 
 from fastapi import APIRouter, Depends, Query, status, HTTPException
 
-from city_pollution.dependencies import get_db, Session
+from city_pollution.dependencies import get_db, Session, get_pollution_service
 
 from city_pollution.schemas.pollution import (
     PollutionSchema,
@@ -11,11 +11,6 @@ from city_pollution.schemas.pollution import (
     Aggregate,
 )
 
-from city_pollution.services.pollution import (
-    get_pollution_data_service,
-    import_historical_pollution,
-    delete_pollution_data_service,
-)
 
 router = APIRouter(
     prefix="/api/pollution",
@@ -41,7 +36,8 @@ async def get_pollution_data(
     db: Session = Depends(get_db),
 ) -> PollutionItemList:
     try:
-        return await get_pollution_data_service(
+        pollution_service = await get_pollution_service()
+        return await pollution_service.get_pollution_data_service(
             aggregate, city_id, dates, db, limit, offset
         )
     except ValueError as e:
@@ -61,7 +57,8 @@ async def import_historical_pollution_by_coords(
     pollution_params: PollutionSchema, db: Session = Depends(get_db)
 ) -> Dict[str, str]:
     try:
-        return await import_historical_pollution(pollution_params, db)
+        pollution_service = await get_pollution_service()
+        return await pollution_service.import_historical_pollution(pollution_params, db)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
@@ -78,6 +75,7 @@ async def delete_pollution_data(
     db: Session = Depends(get_db),
 ) -> Dict[str, Union[bool, int]]:
     try:
-        return await delete_pollution_data_service(city_id, dates, db)
+        pollution_service = await get_pollution_service()
+        return await pollution_service.delete_pollution_data_service(city_id, dates, db)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

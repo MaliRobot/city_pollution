@@ -9,7 +9,7 @@ city_table = Table(
     mapper_registry.metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("name", String(255), nullable=False, index=True),
-    Column("state", String(255), nullable=False),
+    Column("state", String(255), nullable=True),
     Column("country", String(255), nullable=False),
     Column("county", String(255)),
     Column("lat", Float, nullable=False),

@@ -3,9 +3,8 @@ from typing import Any, Optional, List
 from fastapi import APIRouter, Query, Depends, HTTPException
 
 from city_pollution.db.repositories.city_repository import CityRepository
-from city_pollution.dependencies import Session, get_db
+from city_pollution.dependencies import Session, get_db, get_city_service
 from city_pollution.schemas.city import City
-from city_pollution.services.city import get_city_by_name, extract_cities_from_raw_data
 
 router = APIRouter(
     prefix="/api/city",
@@ -38,10 +37,11 @@ def get_cities_list(
 async def find_city_by_name(
     name: str = Query(..., description="City name", min_length=1, max_length=255),
 ) -> Any:
-    cities = await get_city_by_name(name)
+    city_service = await get_city_service()
+    cities = await city_service.geocoder_service.get_city_by_name(name)
     if cities is None:
         raise HTTPException(status_code=404, detail="City not found")
-    cities = await extract_cities_from_raw_data(cities)
+    cities = await city_service.extract_cities_from_raw_data(cities)
     return cities
 
 
