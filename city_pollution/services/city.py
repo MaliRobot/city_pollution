@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from city_pollution.entities import City
 from city_pollution.services.geocoder_service import (
@@ -17,7 +17,7 @@ def city_from_raw_data(raw_data: Dict[Any, Any]) -> City | None:
     :rtype: City | None
     """
     data = raw_data["components"]
-    if data["_type"] == "city":
+    if data["_type"] == "city" or data.get("city"):
         city_name = data.get("city") or data.get("town")
         geometry = raw_data.get("geometry")
         if not city_name or not geometry:
@@ -39,10 +39,11 @@ def city_from_raw_data(raw_data: Dict[Any, Any]) -> City | None:
 async def extract_cities_from_raw_data(
     cities_raw_data: Dict[Any, Any]
 ) -> List[City | None]:
+    print(cities_raw_data)
     return [
         city_from_raw_data(loc)
         for loc in cities_raw_data
-        if loc["components"]["_type"] in ["city", "town"]
+        if "city" in loc["components"] or loc["components"]["_type"] in ["city", "town"]
     ]
 
 
