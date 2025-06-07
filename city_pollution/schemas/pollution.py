@@ -59,7 +59,7 @@ class PollutionSchema(BaseModel):
     lat: Latitude
     lon: Longitude
     dates: Dates
-    name: str
+    name: Optional[str] = None
 
 
 class PollutionItem(BaseModel):

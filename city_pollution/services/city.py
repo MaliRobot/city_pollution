@@ -46,7 +46,9 @@ async def extract_cities_from_raw_data(
     ]
 
 
-async def get_city(lat: float, lon: float, city_name: str) -> City | None:
+async def get_city(
+    lat: float, lon: float, city_name: Optional[str] = None
+) -> City | None:
     """
     Search for the city using the geocoder with given city name,
     latitude and longitude. Preprocess data using other functions
@@ -59,7 +61,9 @@ async def get_city(lat: float, lon: float, city_name: str) -> City | None:
     :return:
     """
     city_by_geocode = await get_reverse_geocode(lat, lon)
-    city_by_name = await get_city_by_name(city_name)
+    city_by_name = []
+    if city_name:
+        city_by_name = await get_city_by_name(city_name)
     all_cities = city_by_name + city_by_geocode
     if all_cities is not None:
         cities = await extract_cities_from_raw_data(all_cities)

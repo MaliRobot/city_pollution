@@ -326,9 +326,14 @@ async def import_historical_pollution(
     pollution_params: PollutionSchema, db: Session
 ) -> Dict[str, str]:
     city_repo = CityRepository(db)
-    city = city_repo.search_city(
-        pollution_params.name, pollution_params.lat, pollution_params.lon
-    )
+    if pollution_params.name:
+        city = city_repo.search_city(
+            pollution_params.name, pollution_params.lat, pollution_params.lon
+        )
+    else:
+        city = city_repo.get_city_by_lat_and_lon(
+            pollution_params.lat, pollution_params.lon
+        )
 
     if city is None:
         city_data = await get_city(
