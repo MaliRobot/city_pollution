@@ -94,7 +94,7 @@ def test_import_pollution_data(
         )
 
     mocker.patch(
-        "city_pollution.services.pollution.get_city",
+        "city_pollution.services.city.get_city",
         fake_get_city,
     )
 

@@ -2,7 +2,10 @@ from typing import Dict, Any, List, Optional
 from abc import ABC, abstractmethod
 
 from city_pollution.entities import City
-from city_pollution.services.geocoder_service import GeocoderService
+from city_pollution.services.geocoder_service import (
+    GeocoderService,
+    GeocoderServiceInterface,
+)
 
 TOLERANCE = 0.5  # degrees
 
@@ -136,9 +139,11 @@ async def get_city(
     lat: float, lon: float, city_name: Optional[str] = None
 ) -> City | None:
     """Legacy function wrapper - deprecated, use CityService instead"""
-    from city_pollution.services.geocoder_service import get_geocoder
+    from city_pollution.services.geocoder_service import GeocoderService
 
-    geocoder = await get_geocoder()
+    geocoder_service = GeocoderService(GeocoderServiceInterface())
+
+    geocoder = await geocoder_service._get_geocoder()
     geocoder_service = GeocoderService(geocoder)
     service = CityService(geocoder_service)
     return await service.get_city(lat, lon, city_name)

@@ -34,7 +34,7 @@ def test_get_city_coords_by_name(
             }
         ]
 
-    mocker.patch("city_pollution.routers.city.get_city_by_name", get_fake_city_by_name)
+    mocker.patch("city_pollution.routers.city.find_city_by_name", get_fake_city_by_name)
 
     valid_name = "New York"
     response = client.get("api/city/name/", params={"name": valid_name})
